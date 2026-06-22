@@ -5,125 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo - VELTRIX</title>
     <link rel="stylesheet" href="style.css">
-    
-    <style>
-        .secao-didatica-landing {
-            background: rgba(15, 23, 42, 0.6) !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-radius: 20px !important;
-            padding: 22px !important;
-            margin: 20px 0 !important;
-        }
-
-        .secao-didatica-landing p {
-            color: #CBD5E1 !important;
-            font-size: 14.5px !important;
-            line-height: 1.6 !important;
-            text-align: center !important;
-            margin: 0 !important;
-        }
-
-        .grid-quadrados-landing {
-            display: grid !important;
-            grid-template-columns: repeat(3, 1fr) !important;
-            gap: 12px !important;
-            margin: 25px 0 !important;
-            width: 100% !important;
-        }
-
-        .card-quadrado-premium {
-            background: #0F172A !important;
-            border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-radius: 16px !important;
-            padding: 16px 10px !important;
-            text-align: center !important;
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 8px !important;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
-            min-height: 120px !important;
-        }
-
-        .card-quadrado-premium strong {
-            font-size: 13px !important;
-            color: #22D3EE !important;
-            display: block !important;
-        }
-
-        .card-quadrado-premium span {
-            font-size: 11px !important;
-            color: #94A3B8 !important;
-            line-height: 1.3 !important;
-            display: block !important;
-        }
-
-        .btn-landing-premium {
-            background: linear-gradient(135deg, #2563EB, #22D3EE) !important;
-            color: white !important;
-            font-weight: bold !important;
-            box-shadow: 0 8px 20px rgba(34, 211, 238, 0.2) !important;
-        }
-    </style>
 </head>
 <body class="app-page">
 
-    <main class="app-container" style="display: flex; flex-direction: column; gap: 10px;">
+    <main class="app-container">
         
-        <header class="app-header" style="justify-content: center; flex-direction: column; text-align: center; margin-top: 25px; margin-bottom: 10px;">
-            <div>
-                <span style="display: block; font-size: 20px; font-weight: 800; letter-spacing: 1px; background: linear-gradient(135deg, #2563EB, #22D3EE); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 15px; font-style: italic;">
-                    Seja muito bem-vindo à
-                </span>
+        <header style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 15px; margin-bottom: 5px;">
+            <span style="display: block; font-size: 16px; font-weight: 700; letter-spacing: 1px; background: linear-gradient(135deg, #2563EB, #22D3EE); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; font-style: italic;">
+                Seja muito bem-vindo à
+            </span>
 
-                <div style="display: flex; align-items: center; justify-content: center; gap: 4px; margin-bottom: 5px;">
-                    <span style="font-size: 64px; font-weight: 900; background: linear-gradient(135deg, #2563EB, #22D3EE); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 4px 20px rgba(34, 211, 238, 0.3); line-height: 1;">
-                        V
-                    </span>
-                    <h1 style="font-size: 42px; font-weight: 800; letter-spacing: 2px; color: #ffffff; margin: 0; line-height: 1; padding-top: 5px; text-align: left;">
-                        ELTRIX
-                    </h1>
-                </div>
-                
-                <p style="color: #64748B; font-size: 11px; font-weight: 700; letter-spacing: 3px; margin-top: 10px; text-transform: uppercase; text-align: center;">
-                    Agenda Inteligente & Gestão
-                </p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <span style="font-size: 56px; font-weight: 900; background: linear-gradient(135deg, #2563EB, #22D3EE); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 4px 20px rgba(34, 211, 238, 0.3); line-height: 1;">
+                    V
+                </span>
+                <h1 style="font-size: 38px; font-weight: 800; letter-spacing: 2px; color: #ffffff; margin: 0; line-height: 1; padding-top: 5px;">
+                    ELTRIX
+                </h1>
             </div>
+            
+            <p style="color: #64748B; font-size: 10px; font-weight: 700; letter-spacing: 3px; margin-top: 12px; text-transform: uppercase;">
+                Agenda Inteligente & Gestão
+            </p>
         </header>
 
         <section class="secao-didatica-landing">
             <p>
-                A <strong>VELTRIX</strong> é um ecossistema inteligente voltado para estabelecimentos que buscam automatizar atendimentos e profissionalizar a gestão. Desenvolvido no modelo <em>Multi-Tenant</em>, o sistema permite que cada gestor gerencie sua equipe, controle horários em tempo real e reduza faltas com notificações automatizadas via WhatsApp.
+                A <strong>VELTRIX</strong> é um ecossistema inteligente voltado para estabelecimentos que buscam automatizar atendimentos e profissionalizar a gestão. Desenvolvido no modelo <em>Multi-Tenant</em>, o sistema permite controlar horários em tempo real e reduzir faltas com notificações automatizadas via WhatsApp.
             </p>
         </section>
 
         <section style="width: 100%;">
-            <h2 style="font-size: 16px; color: #22D3EE; font-weight: 700; letter-spacing: 1px; text-align: center; margin-bottom: 5px;">O que você pode fazer:</h2>
+            <h2 style="font-size: 13px; color: #22D3EE; font-weight: 700; letter-spacing: 1px; text-align: center; margin-bottom: 5px; text-transform: uppercase;">
+                O que você pode fazer
+            </h2>
             
             <div class="grid-quadrados-landing">
                 <div class="card-quadrado-premium">
-                    <span style="font-size: 24px;">📅</span>
-                    <strong>Agendamentos</strong>
-                    <span>Controle horários fluidos.</span>
+                    <div class="card-icon">📅</div>
+                    <strong>Agendamentos em Segundos</strong>
+                    <span>Controle horários, evite choques na agenda e organize seus atendimentos.</span>
                 </div>
 
                 <div class="card-quadrado-premium">
-                    <span style="font-size: 24px;">👥</span>
-                    <strong>Operadores</strong>
-                    <span>Gerencie sua equipe ativa.</span>
+                    <div class="card-icon">👥</div>
+                    <strong>Controle de Operadores</strong>
+                    <span>Gerencie o acesso da sua equipe e defina permissões personalizadas.</span>
                 </div>
 
                 <div class="card-quadrado-premium">
-                    <span style="font-size: 24px;">📊</span>
-                    <strong>Relatórios</strong>
-                    <span>Acompanhe faturamentos.</span>
+                    <div class="card-icon">📊</div>
+                    <strong>Estatísticas de Desempenho</strong>
+                    <span>Acompanhe a evolução do seu negócio com relatórios simplificados.</span>
                 </div>
             </div>
+            
+            <div class="swipe-indicator">Deslize para o lado ➔</div>
         </section>
 
-        <div style="margin-top: 15px;">
-            <a href="login.html" class="dashboard-button btn-landing-premium">
+        <div style="width: 100%; margin-top: 10px;">
+            <a href="login.html" class="btn-landing-premium">
                 Começar Agora →
             </a>
         </div>
