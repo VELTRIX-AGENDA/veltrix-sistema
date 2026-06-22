@@ -5,10 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bem-vindo - VELTRIX</title>
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        /* Ajuste fino focado na seção didática e nos blocos em modo mobile */
+        .secao-didatica-landing {
+            width: 100%;
+            max-width: 480px;
+            margin: 15px auto;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        .secao-didatica-landing p {
+            color: #94A3B8 !important;
+            font-size: 13px !important;
+            line-height: 1.5 !important;
+            text-align: center !important;
+            margin: 0;
+        }
+
+        /* Grid flexível: Em telas pequenas fica vertical; em telas grandes fica lado a lado */
+        .grid-quadrados-landing {
+            display: grid !important;
+            grid-template-columns: 1fr !important;
+            gap: 12px !important;
+            width: 100%;
+            max-width: 480px;
+            margin: 20px auto !important;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+
+        /* Quando a tela for maior que 480px, os blocos se alinham horizontalmente */
+        @media (min-width: 481px) {
+            .grid-quadrados-landing {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+        }
+
+        .card-quadrado-premium {
+            background: #0F172A !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 12px !important;
+            padding: 14px !important;
+            text-align: center !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 6px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .card-quadrado-premium strong {
+            font-size: 14px !important;
+            color: #22D3EE !important;
+            display: block !important;
+        }
+
+        .card-quadrado-premium span {
+            font-size: 12px !important;
+            color: #64748B !important;
+            line-height: 1.3 !important;
+            display: block !important;
+        }
+
+        /* Container centralizador do botão para manter alinhamento mobile */
+        .container-btn-landing {
+            width: 100%;
+            max-width: 480px;
+            margin: 15px auto 30px auto;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+    </style>
 </head>
 <body class="app-page">
 
-    <main class="app-container" style="display: flex; flex-direction: column; gap: 10px;">
+    <main class="app-container" style="display: flex; flex-direction: column; gap: 5px;">
         
         <header class="app-header" style="justify-content: center; flex-direction: column; text-align: center; margin-top: 25px; margin-bottom: 10px;">
             <div>
@@ -37,29 +111,34 @@
             </p>
         </section>
 
-        <section>
-            <h2 style="font-size: 16px; color: #22D3EE; font-weight: 700; letter-spacing: 1px; text-align: center; margin-bottom: 5px;">O que você pode fazer:</h2>
+        <section style="width: 100%;">
+            <h2 style="font-size: 15px; color: #22D3EE; font-weight: 700; letter-spacing: 1px; text-align: center; margin-bottom: 5px;">
+                O que você pode fazer:
+            </h2>
             
             <div class="grid-quadrados-landing">
                 <div class="card-quadrado-premium">
-                    <strong>📅 Agendamentos</strong>
-                    <span>Controle horários, elimine choques de agenda na equipe e permita marcações fluidas.</span>
+                    <span style="font-size: 22px;">📅</span>
+                    <strong>Agendamentos</strong>
+                    <span>Controle horários, evite choques na agenda e organize seus atendimentos.</span>
                 </div>
 
                 <div class="card-quadrado-premium">
-                    <strong>👥 Operadores</strong>
-                    <span>Gerencie sua equipe, customize as jornadas e controle níveis de acesso.</span>
+                    <span style="font-size: 22px;">👥</span>
+                    <strong>Operadores</strong>
+                    <span>Gerencie o acesso da sua equipe e defina permissões personalizadas.</span>
                 </div>
 
-                <div class="card-quadrado-premium">
-                    <strong>📊 Relatórios</strong>
-                    <span>Acompanhe faturamentos e relatórios simplificados para decisões seguras.</span>
+                <div class="card-quadrado-premium text-center">
+                    <span style="font-size: 22px;">📊</span>
+                    <strong>Relatórios</strong>
+                    <span>Acompanhe a evolução do seu negócio com relatórios simplificados.</span>
                 </div>
             </div>
         </section>
 
-        <div style="margin-top: 10px;">
-            <a href="login.html" class="dashboard-button btn-landing-premium">
+        <div class="container-btn-landing">
+            <a href="login.html" class="dashboard-button btn-landing-premium" style="display: flex; align-items: center; justify-content: center; width: 100%; box-sizing: border-box;">
                 Começar Agora →
             </a>
         </div>
