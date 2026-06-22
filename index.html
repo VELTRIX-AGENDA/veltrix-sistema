@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="style.css">
     
     <style>
-        /* Forçar o tema escuro original e resetar falhas do navegador */
+        /* Manutenção do Tema Escuro Premium */
         html, body {
             background-color: #050816 !important;
             color: #ffffff !important;
@@ -15,13 +15,13 @@
             padding: 0;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .app-page {
             background-color: #050816 !important;
         }
 
-        /* Container principal - Ajustado para telas mobile */
         .app-container {
             width: 100%;
             max-width: 440px;
@@ -33,7 +33,6 @@
             gap: 15px;
         }
 
-        /* Seção didática elegante com fundo semi-transparente */
         .secao-didatica-landing {
             background: rgba(15, 23, 42, 0.4) !important;
             border: 1px solid rgba(255, 255, 255, 0.05) !important;
@@ -50,54 +49,57 @@
             margin: 0;
         }
 
-        /* Grid focado em Mobile First */
+        /* CONTAINER DO CARROSSEL EM MODO MOBILE (SWIPE) */
         .grid-quadrados-landing {
             display: flex !important;
-            flex-direction: column !important;
-            gap: 12px !important;
+            flex-direction: row !important;
+            gap: 14px !important;
             width: 100%;
-            margin: 15px 0 !important;
+            overflow-x: auto !important; /* Permite arrastar para o lado */
+            scroll-snap-type: x mandatory !important;
+            padding: 10px 4px 20px 4px !important;
             box-sizing: border-box;
+            scrollbar-width: none; /* Esconde barra no Firefox */
         }
 
-        /* Cards horizontais modernos para o mobile, evitando textos cortados */
+        .grid-quadrados-landing::-webkit-scrollbar {
+            display: none; /* Esconde barra no Chrome/Safari */
+        }
+
+        /* CARDS QUADRADOS MODERNOS */
         .card-quadrado-premium {
             background: #0F172A !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
-            border-radius: 14px !important;
-            padding: 14px 16px !important;
+            border-radius: 16px !important;
+            padding: 18px 16px !important;
             display: flex !important;
-            flex-direction: row !important; /* Ícone do lado no mobile fica muito mais limpo */
+            flex-direction: column !important;
             align-items: center !important;
-            gap: 14px !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+            text-align: center !important;
+            gap: 10px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
             box-sizing: border-box;
-            text-align: left !important;
+            
+            /* Define o tamanho fixo do bloco no mobile para o efeito de slide */
+            flex: 0 0 82% !important; 
+            scroll-snap-align: center !important;
         }
 
         .card-icon {
-            font-size: 24px;
+            font-size: 28px;
             background: rgba(34, 211, 238, 0.1);
-            padding: 10px;
-            border-radius: 10px;
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 44px;
-            height: 44px;
-            box-sizing: border-box;
-        }
-
-        .card-text-content {
-            display: flex;
-            flex-direction: column;
-            gap: 3px;
         }
 
         .card-quadrado-premium strong {
-            font-size: 14px !important;
+            font-size: 15px !important;
             color: #22D3EE !important;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .card-quadrado-premium span {
@@ -106,7 +108,15 @@
             line-height: 1.4 !important;
         }
 
-        /* Botão de ação em largura total para mobile */
+        /* Indicador visual de que dá para arrastar */
+        .swipe-indicator {
+            text-align: center;
+            color: #64748B;
+            font-size: 11px;
+            margin-top: -10px;
+            letter-spacing: 1px;
+        }
+
         .btn-landing-premium {
             background: linear-gradient(135deg, #2563EB, #22D3EE) !important;
             color: #ffffff !important;
@@ -121,7 +131,6 @@
             border-radius: 12px !important;
             box-shadow: 0 4px 15px rgba(34, 211, 238, 0.25) !important;
             box-sizing: border-box;
-            transition: opacity 0.2s;
         }
     </style>
 </head>
@@ -155,38 +164,34 @@
         </section>
 
         <section style="width: 100%;">
-            <h2 style="font-size: 14px; color: #22D3EE; font-weight: 700; letter-spacing: 1px; text-align: center; margin-bottom: 12px; text-transform: uppercase;">
+            <h2 style="font-size: 13px; color: #22D3EE; font-weight: 700; letter-spacing: 1px; text-align: center; margin-bottom: 5px; text-transform: uppercase;">
                 O que você pode fazer
             </h2>
             
             <div class="grid-quadrados-landing">
                 <div class="card-quadrado-premium">
                     <div class="card-icon">📅</div>
-                    <div class="card-text-content">
-                        <strong>Agendamentos em Segundos</strong>
-                        <span>Controle horários, evite choques na agenda e organize seus atendimentos.</span>
-                    </div>
+                    <strong>Agendamentos em Segundos</strong>
+                    <span>Controle horários, evite choques na agenda e organize seus atendimentos.</span>
                 </div>
 
                 <div class="card-quadrado-premium">
                     <div class="card-icon">👥</div>
-                    <div class="card-text-content">
-                        <strong>Controle de Operadores</strong>
-                        <span>Gerencie o acesso da sua equipe e defina permissões personalizadas.</span>
-                    </div>
+                    <strong>Controle de Operadores</strong>
+                    <span>Gerencie o acesso da sua equipe e defina permissões personalizadas.</span>
                 </div>
 
                 <div class="card-quadrado-premium">
                     <div class="card-icon">📊</div>
-                    <div class="card-text-content">
-                        <strong>Estatísticas de Desempenho</strong>
-                        <span>Acompanhe a evolução do seu negócio com relatórios simplificados.</span>
-                    </div>
+                    <strong>Estatísticas de Desempenho</strong>
+                    <span>Acompanhe a evolução do seu negócio com relatórios simplificados.</span>
                 </div>
             </div>
+            
+            <div class="swipe-indicator">Deslize para o lado ➔</div>
         </section>
 
-        <div style="width: 100%; margin-top: 5px;">
+        <div style="width: 100%; margin-top: 10px;">
             <a href="login.html" class="btn-landing-premium">
                 Começar Agora →
             </a>
