@@ -432,7 +432,6 @@ button:hover,
     color: #94A3B8;
 }
 
-/* Container do Botão Hambúrguer */
 .hamburger-container {
     display: inline-block;
     margin-bottom: 15px;
@@ -459,7 +458,6 @@ button:hover,
     background: #1E293B;
 }
 
-/* RECONSTRUÇÃO DA SIDEBAR (MENU LATERAL GAVETA) - CORRIGIDA */
 .sidebar-menu {
     position: fixed !important;
     top: 0;
@@ -470,14 +468,11 @@ button:hover,
     border-right: 1px solid rgba(255,255,255,0.08);
     z-index: 10000 !important; 
     padding: 30px 24px;
-    
-    /* Coordenadas de translação limpas para evitar colisões */
     transform: translateX(-100%) !important;
     opacity: 0;
     transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out;
 }
 
-/* Gatilhos Universais de Abertura */
 .sidebar-menu.ativo, 
 [style*="left: 0px"], 
 [style*="left: 0"],
@@ -487,7 +482,6 @@ button:hover,
     opacity: 1 !important;
 }
 
-/* Fundo escuro protetor (Overlay) */
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -992,4 +986,71 @@ button:hover,
     0% { transform: scale(0); }
     80% { transform: scale(1.2); }
     100% { transform: scale(1); }
+}
+
+/* =======================================================
+   ESTILO EXCLUSIVO DA PÁGINA INICIAL - VELTRIX CARD GRID
+   ======================================================= */
+.secao-didatica-landing {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    padding: 22px !important;
+    margin: 20px 0 !important;
+}
+
+.secao-didatica-landing p {
+    color: #CBD5E1 !important;
+    font-size: 14.5px !important;
+    line-height: 1.6 !important;
+    text-align: center !important;
+}
+
+.grid-quadrados-landing {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+    margin: 25px 0 !important;
+}
+
+@media (min-width: 480px) {
+    .grid-quadrados-landing {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}
+
+.card-quadrado-premium {
+    background: #0F172A !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 20px !important;
+    text-align: left !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
+    transition: transform 0.2s, border-color 0.2s !important;
+}
+
+.card-quadrado-premium:hover {
+    border-color: #22D3EE !important;
+    transform: translateY(-3px) !important;
+}
+
+.card-quadrado-premium strong {
+    font-size: 15px !important;
+    color: #22D3EE !important;
+}
+
+.card-quadrado-premium span {
+    font-size: 13px !important;
+    color: #94A3B8 !important;
+    line-height: 1.4 !important;
+}
+
+.btn-landing-premium {
+    background: linear-gradient(135deg, #2563EB, #22D3EE) !important;
+    color: white !important;
+    font-weight: bold !important;
+    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.2) !important;
 }
