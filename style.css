@@ -1,75 +1,1126 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bem-vindo - VELTRIX</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="app-page">
+/* =======================================================
+   1. RESET E DIRETIVAS GLOBAIS
+   ======================================================= */
+* {
+    box-sizing: border-box;
+}
 
-    <main class="app-container">
-        
-        <header style="display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 15px; margin-bottom: 5px;">
-            <span style="display: block; font-size: 16px; font-weight: 700; letter-spacing: 1px; background: linear-gradient(135deg, #2563EB, #22D3EE); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 8px; font-style: italic;">
-                Seja muito bem-vindo à
-            </span>
+body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+    margin: 0;
+    padding: 30px;
+    color: #111;
+}
 
-            <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                <span style="font-size: 56px; font-weight: 900; background: linear-gradient(135deg, #2563EB, #22D3EE); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0px 4px 20px rgba(34, 211, 238, 0.3); line-height: 1;">
-                    V
-                </span>
-                <h1 style="font-size: 38px; font-weight: 800; letter-spacing: 2px; color: #ffffff; margin: 0; line-height: 1; padding-top: 5px;">
-                    ELTRIX
-                </h1>
-            </div>
-            
-            <p style="color: #64748B; font-size: 10px; font-weight: 700; letter-spacing: 3px; margin-top: 12px; text-transform: uppercase;">
-                Agenda Inteligente & Gestão
-            </p>
-        </header>
+h1, h2, p {
+    margin-top: 0;
+}
 
-        <section class="secao-didatica-landing">
-            <p>
-                A <strong>VELTRIX</strong> é um ecossistema inteligente voltado para estabelecimentos que buscam automatizar atendimentos e profissionalizar a gestão. Desenvolvido no modelo <em>Multi-Tenant</em>, o sistema permite controlar horários em tempo real e reduzir faltas com notificações automatizadas via WhatsApp.
-            </p>
-        </section>
+h1, h2 {
+    text-align: center;
+}
 
-        <section style="width: 100%;">
-            <h2 style="font-size: 13px; color: #22D3EE; font-weight: 700; letter-spacing: 1px; text-align: center; margin-bottom: 5px; text-transform: uppercase;">
-                O que você pode fazer
-            </h2>
-            
-            <div class="grid-quadrados-landing">
-                <div class="card-quadrado-premium">
-                    <div class="card-icon">📅</div>
-                    <strong>Agendamentos em Segundos</strong>
-                    <span>Controle horários, evite choques na agenda e organize seus atendimentos.</span>
-                </div>
+label {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    display: block;
+    font-weight: bold;
+}
 
-                <div class="card-quadrado-premium">
-                    <div class="card-icon">👥</div>
-                    <strong>Controle de Operadores</strong>
-                    <span>Gerencie o acesso da sua equipe e defina permissões personalizadas.</span>
-                </div>
+input,
+select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
 
-                <div class="card-quadrado-premium">
-                    <div class="card-icon">📊</div>
-                    <strong>Estatísticas de Desempenho</strong>
-                    <span>Acompanhe a evolução do seu negócio com relatórios simplificados.</span>
-                </div>
-            </div>
-            
-            <div class="swipe-indicator">Deslize para o lado ➔</div>
-        </section>
+button,
+.dashboard-button {
+    width: 100%;
+    padding: 14px;
+    background: #111;
+    color: white;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
 
-        <div style="width: 100%; margin-top: 10px;">
-            <a href="login.html" class="btn-landing-premium">
-                Começar Agora →
-            </a>
-        </div>
+button:hover,
+.dashboard-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 5px 12px rgba(0,0,0,0.2);
+}
 
-    </main>
+/* =======================================================
+   2. CONTAINERS E ESTRUTURAS DE FORMULÁRIOS
+   ======================================================= */
+.login-container,
+.form-card,
+.lista-card,
+.dashboard-card {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.12);
+}
 
-</body>
-</html>
+.login-container {
+    max-width: 420px;
+    margin: 80px auto;
+}
+
+.pagina-agendamentos {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.lista-card {
+    min-height: 400px;
+}
+
+.agendamento-item {
+    background: #f9fafb;
+    padding: 16px;
+    border-radius: 14px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    border: 1px solid #eee;
+}
+
+.agendamento-item strong {
+    font-size: 16px;
+}
+
+.agendamento-item span,
+.agendamento-item small {
+    color: #555;
+}
+
+.dashboard-page {
+    min-height: 100vh;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboard-card {
+    width: 460px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.dashboard-card p {
+    text-align: center;
+    color: #666;
+    margin-bottom: 18px;
+}
+
+.caixa-dias {
+    display: none;
+    background: #f9fafb;
+    border: 1px solid #ddd;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.caixa-dias.mostrar {
+    display: block;
+}
+
+.caixa-dias label {
+    font-weight: normal;
+}
+
+.dashboard-card h3 {
+    margin: 18px 0 5px;
+    font-size: 14px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* =======================================================
+   3. ARQUITETURA WEB APP MOBILE-FIRST (TEMA ESCURO)
+   ======================================================= */
+.app-page {
+    background: #050816;
+    color: white;
+    min-height: 100vh;
+    padding: 20px 16px 90px;
+}
+
+.app-container {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 25px;
+}
+
+.logo-mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563EB, #22D3EE);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.app-header h1 {
+    text-align: left;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.app-header p {
+    margin: 4px 0 0;
+    color: #94A3B8;
+}
+
+.hero-card {
+    background: linear-gradient(135deg, #111827, #1E293B);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 22px;
+}
+
+.hero-card h2 {
+    text-align: left;
+    margin-bottom: 8px;
+}
+
+.hero-card p {
+    color: #94A3B8;
+}
+
+.app-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+}
+
+.app-card {
+    background: #0F172A;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+    text-decoration: none;
+    padding: 18px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.app-card span {
+    color: #94A3B8;
+    font-size: 14px;
+}
+
+/* =======================================================
+   4. COMPONENTES DE MENUS E LISTAS INTERNAS
+   ======================================================= */
+.bottom-menu {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 28px);
+    max-width: 480px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-around;
+    z-index: 999;
+}
+
+.bottom-menu a {
+    color: #94A3B8;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.bottom-menu a:hover {
+    color: #22D3EE;
+}
+
+.mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mobile-list .agendamento-item {
+    background: #0F172A;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+}
+
+.mobile-list .agendamento-item span,
+.mobile-list .agendamento-item small {
+    color: #94A3B8;
+}
+
+.back-button {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: #0F172A;
+    color: white;
+    border-radius: 12px;
+    font-size: 20px;
+    font-weight: bold;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.back-button:hover {
+    color: #22D3EE;
+}
+
+.mobile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-section {
+    background: #0F172A;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 18px;
+}
+
+.form-section h3 {
+    margin: 0 0 14px;
+    color: white;
+}
+
+.form-section label {
+    color: #CBD5E1;
+}
+
+.form-section input,
+.form-section select {
+    background: #020617;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.12);
+}
+
+.form-section input::placeholder {
+    color: #64748B;
+}
+
+#tempoServico {
+    color: #22D3EE;
+    font-size: 14px;
+    margin-bottom: 12px;
+}
+
+.primary-action {
+    background: linear-gradient(135deg, #2563EB, #22D3EE);
+    color: white;
+    font-size: 16px;
+    border-radius: 18px;
+    margin-top: 4px;
+}
+
+/* =======================================================
+   5. INTERFACE DASHBOARD MODERNA
+   ======================================================= */
+.dashboard-modern {
+    padding-bottom: 100px;
+}
+
+.dashboard-hero {
+    background: linear-gradient(135deg, #111827, #1E3A8A);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 28px;
+    padding: 26px;
+    margin-bottom: 22px;
+}
+
+.dashboard-hero span {
+    color: #22D3EE;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.dashboard-hero h2 {
+    text-align: left;
+    margin: 12px 0;
+    font-size: 28px;
+    line-height: 1.1;
+}
+
+.dashboard-hero p {
+    color: #CBD5E1;
+    line-height: 1.5;
+}
+
+.dashboard-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.menu-category {
+    background: #0F172A;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 24px;
+    padding: 18px;
+}
+
+.menu-category h3 {
+    margin: 0 0 12px;
+    color: #22D3EE;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.menu-category a {
+    display: block;
+    background: #020617;
+    color: white;
+    text-decoration: none;
+    padding: 14px;
+    border-radius: 16px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.menu-category a:last-child {
+    margin-bottom: 0;
+}
+
+.dashboard-active {
+    margin-top: 24px;
+}
+
+.dashboard-active h2 {
+    text-align: left;
+    margin-bottom: 14px;
+}
+
+.dashboard-active-card,
+.empty-state {
+    background: #0F172A;
+    border: 1px solid rgba(255,255,255,0.08);
+    color: white;
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dashboard-active-card span,
+.dashboard-active-card small,
+.empty-state {
+    color: #94A3B8;
+}
+
+/* =======================================================
+   6. COMPONENTES SIDEBAR E NAVEGAÇÃO LATERAL
+   ======================================================= */
+.hamburger-container {
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.hamburger-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    background: #0F172A;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.08);
+    font-size: 22px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: background 0.2s;
+}
+
+.hamburger-button:hover {
+    background: #1E293B;
+}
+
+.sidebar-menu {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: #020617;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    z-index: 10000 !important; 
+    padding: 30px 24px;
+    transform: translateX(-100%) !important;
+    opacity: 0;
+    transition: transform 0.3s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.sidebar-menu.ativo, 
+[style*="left: 0px"], 
+[style*="left: 0"],
+[style*="transform: translateX(0px)"] {
+    transform: translateX(0) !important;
+    left: 0 !important;
+    opacity: 1 !important;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 9999 !important;
+}
+
+.sidebar-overlay.ativo,
+[style*="display: block"] {
+    display: block !important;
+}
+
+.sidebar-menu h2 {
+    text-align: left;
+    color: white;
+    margin-bottom: 24px;
+    font-size: 22px;
+    letter-spacing: 1px;
+}
+
+.sidebar-menu a {
+    display: block;
+    color: #CBD5E1;
+    text-decoration: none;
+    padding: 14px 16px;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.sidebar-menu a:hover {
+    background: #0F172A;
+    color: #22D3EE;
+    transform: translateX(4px);
+}
+
+/* =======================================================
+   7. DETALHES DE ESTILIZAÇÃO E CARDS ESPECÍFICOS
+   ======================================================= */
+.compact-hero {
+    padding: 18px;
+    border-radius: 22px;
+    margin-bottom: 18px;
+}
+
+.compact-hero span {
+    font-size: 11px;
+}
+
+.compact-hero h2 {
+    font-size: 22px;
+    margin: 8px 0;
+}
+
+.compact-hero p {
+    font-size: 14px;
+    margin: 0;
+}
+
+.acoes-atendimento {
+    display: none;
+    margin-top: 12px;
+    gap: 8px;
+}
+
+.acoes-atendimento.mostrar {
+    display: flex;
+    flex-direction: column;
+}
+
+.acoes-atendimento button {
+    background: #020617;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: white;
+    border-radius: 14px;
+}
+
+.menu-plus {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #2563EB, #22D3EE);
+    color: white !important;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: bold;
+    margin-top: -35px;
+    box-shadow: 0 10px 25px rgba(34,211,238,0.35);
+}
+
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #0F172A;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.stat-card span {
+    color: #22D3EE;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-card strong {
+    color: white;
+    font-size: 26px;
+}
+
+.stat-card small {
+    color: #94A3B8;
+}
+
+.stat-card.destaque {
+    grid-column: span 2;
+    background: linear-gradient(135deg, #2563EB, #0F172A);
+}
+
+.next-card {
+    background: linear-gradient(135deg, #0F172A, #111827);
+    border: 1px solid rgba(34,211,238,0.25);
+    border-radius: 24px;
+    padding: 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 30px rgba(34,211,238,0.08);
+}
+
+.next-card span {
+    color: #22D3EE;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.next-card h2 {
+    text-align: left;
+    color: white;
+    margin: 10px 0 6px;
+    font-size: 22px;
+}
+
+.next-card p {
+    color: #94A3B8;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* =======================================================
+   8. PÁGINAS GESTÃO, FINANCEIRO E COMPROMISSOS
+   ======================================================= */
+.financeiro-filtros-rapidos {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+}
+
+.financeiro-filtros-rapidos button {
+    border: none;
+    background: #0F172A;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.financeiro-filtros-rapidos button:hover {
+    background: #2563EB;
+}
+
+.top-servicos-card {
+    background: #0F172A;
+    border-radius: 22px;
+    padding: 20px;
+    margin-top: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.top-servicos-card h3 {
+    color: white;
+    margin-bottom: 16px;
+}
+
+.servico-ranking {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.servico-ranking:last-child {
+    border-bottom: none;
+}
+
+.servico-ranking strong {
+    color: white;
+}
+
+.servico-ranking span {
+    color: #22D3EE;
+}
+
+.agenda-dia {
+    margin-top: 24px;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #0F172A, #1E293B);
+    border-radius: 16px;
+    color: #22D3EE;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(34,211,238,0.15);
+}
+
+.status-fechado {
+    margin-top: 10px;
+    padding: 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    color: #94A3B8;
+    font-size: 13px;
+}
+
+/* =======================================================
+   9. PERFIS DE CLIENTES E EQUIPE (VIP / BADGES / AVATARES)
+   ======================================================= */
+.cliente-card {
+    cursor: pointer;
+}
+
+.cliente-detalhes {
+    display: none;
+    margin-top: 12px;
+    gap: 8px;
+    flex-direction: column;
+}
+
+.cliente-detalhes.mostrar {
+    display: flex;
+}
+
+.cliente-detalhes button {
+    margin-top: 8px;
+    background: #020617;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: white;
+    border-radius: 14px;
+}
+
+.vip-badge,
+.master-badge {
+    margin-left: 8px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    color: #000;
+}
+
+.vip-badge {
+    background: linear-gradient(135deg, #38BDF8, #06B6D4);
+    color: #000;
+    box-shadow: 0 0 15px rgba(56,189,248,.35);
+}
+
+.master-badge {
+    background: linear-gradient(135deg, #FFD700, #F59E0B);
+    color: #000;
+    font-weight: 900;
+    box-shadow: 0 0 20px rgba(245,158,11,.45);
+}
+
+.profissional-card {
+    gap: 14px;
+}
+
+.profissional-info {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.profissional-foto,
+.profissional-avatar {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.profissional-avatar {
+    background: linear-gradient(135deg, #2563EB, #22D3EE);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 900;
+}
+
+.profissionais-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.profissional-quadrado {
+    background: #0F172A;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 14px;
+    min-height: 170px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+    color: white;
+}
+
+.profissional-card-foto,
+.profissional-card-avatar {
+    width: 86px;
+    height: 86px;
+    border-radius: 24px;
+    object-fit: cover;
+}
+
+.profissional-card-avatar {
+    background: linear-gradient(135deg, #2563EB, #22D3EE);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    font-weight: 900;
+}
+
+.profissional-quadrado strong {
+    margin-top: 10px;
+}
+
+.profissional-quadrado button {
+    padding: 9px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.adicionar-profissional {
+    cursor: pointer;
+    border: 1px dashed rgba(34,211,238,0.45);
+}
+
+.add-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, #2563EB, #22D3EE);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 900;
+}
+
+/* =======================================================
+   10. GRIDS GERAIS E STATUS BADGES
+   ======================================================= */
+.dias-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 10px 0 18px;
+}
+
+.dias-grid label {
+    background: #020617;
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #CBD5E1;
+    border-radius: 14px;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.dias-grid input {
+    width: auto;
+    margin: 0 4px 0 0;
+}
+
+.profissional-opcao.selecionado {
+    border: 2px solid #22D3EE;
+    box-shadow: 0 0 22px rgba(34,211,238,0.35);
+    transform: translateY(-2px);
+}
+
+.agenda-card {
+    background: #0F172A;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px;
+    padding: 16px;
+    margin-bottom: 12px;
+    color: white;
+    cursor: pointer;
+}
+
+.agenda-card-topo {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.agenda-card-topo strong {
+    display: block;
+    font-size: 24px;
+    color: #22D3EE;
+}
+
+.agenda-card-topo span {
+    display: block;
+    margin-top: 4px;
+    font-weight: 700;
+    color: white;
+}
+
+.agenda-card-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    color: #94A3B8;
+    font-size: 14px;
+}
+
+.status-badge {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 900;
+    white-space: nowrap;
+}
+
+.status-agendado {
+    background: #FACC15;
+    color: #000;
+}
+
+.status-atendimento {
+    background: #38BDF8;
+    color: #000;
+}
+
+.status-finalizado {
+    background: #22C55E;
+    color: #000;
+}
+
+.status-cancelado {
+    background: #EF4444;
+    color: white;
+}
+
+.modal-sucesso-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+.modal-sucesso-conteudo {
+    background-color: #1e1e24;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    border: 1px solid #3a3a42;
+}
+
+.modal-sucesso-icone {
+    font-size: 48px;
+    margin-bottom: 15px;
+    animation: popIcon 0.5s ease-in-out;
+}
+
+@keyframes popIcon {
+    0% { transform: scale(0); }
+    80% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* =======================================================
+   11. ESTILO EXCLUSIVO DA PÁGINA INICIAL - CORRIGIDO PREMIUM
+   ======================================================= */
+.secao-didatica-landing {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 20px !important;
+    padding: 22px !important;
+    margin: 20px 0 !important;
+}
+
+.secao-didatica-landing p {
+    color: #CBD5E1 !important;
+    font-size: 14.5px !important;
+    line-height: 1.6 !important;
+    text-align: center !important;
+}
+
+/* Ativa o Swiper Horizontal arrastável no celular */
+.grid-quadrados-landing {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 14px !important;
+    width: 100%;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    padding: 10px 4px 20px 4px !important;
+    box-sizing: border-box;
+    scrollbar-width: none; /* Oculta barra no Firefox */
+}
+
+.grid-quadrados-landing::-webkit-scrollbar {
+    display: none; /* Oculta barra no Chrome/Safari */
+}
+
+/* Garante que os cards fiquem um ao lado do outro no mobile */
+.card-quadrado-premium {
+    background: #0F172A !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 16px !important;
+    padding: 18px 16px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 10px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4) !important;
+    box-sizing: border-box;
+    flex: 0 0 82% !important; /* Cada card ocupa 82% da largura da tela */
+    scroll-snap-align: center !important;
+    transition: transform 0.2s, border-color 0.2s !important;
+}
+
+.card-icon {
+    font-size: 28px;
+    background: rgba(34, 211, 238, 0.1);
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-quadrado-premium strong {
+    font-size: 15px !important;
+    color: #22D3EE !important;
+    font-weight: 700;
+}
+
+.card-quadrado-premium span {
+    font-size: 12px !important;
+    color: #94A3B8 !important;
+    line-height: 1.4 !important;
+}
+
+.swipe-indicator {
+    text-align: center;
+    color: #64748B;
+    font-size: 11px;
+    margin-top: -10px;
+    letter-spacing: 1px;
+}
+
+.btn-landing-premium {
+    background: linear-gradient(135deg, #2563EB, #22D3EE) !important;
+    color: white !important;
+    font-weight: bold !important;
+    box-shadow: 0 8px 20px rgba(34, 211, 238, 0.2) !important;
+}
+
+/* Se visualizado em telas maiores que o celular, volta para formato de grid lado a lado */
+@media (min-width: 600px) {
+    .grid-quadrados-landing {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        overflow-x: visible !important;
+    }
+    .card-quadrado-premium {
+        flex: initial !important;
+    }
+    .swipe-indicator {
+        display: none;
+    }
+}
