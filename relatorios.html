@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Relatórios - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Relatórios</h1>
+                <p>Análise inteligente da operação</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Relatórios VELTRIX</h2>
+            <p>Veja desempenho, faturamento, cancelamentos e produtividade.</p>
+        </section>
+
+        <div class="financeiro-filtros-rapidos">
+            <button onclick="filtroHoje()">Hoje</button>
+            <button onclick="filtroSemana()">Semana</button>
+            <button onclick="filtroMes()">Mês</button>
+            <button onclick="filtroTodos()">Todos</button>
+        </div>
+
+        <section class="mobile-form">
+            <div class="form-section">
+                <h3>Filtro Personalizado</h3>
+
+                <label>Data Inicial</label>
+                <input type="date" id="dataInicialRelatorio">
+
+                <label>Data Final</label>
+                <input type="date" id="dataFinalRelatorio">
+
+                <button id="btnFiltrarRelatorio" class="primary-action">
+                    Gerar Relatório
+                </button>
+            </div>
+        </section>
+
+        <section class="dashboard-stats">
+            <div class="stat-card destaque">
+                <span>Faturamento</span>
+                <strong id="relatorioFaturamento">R$ 0,00</strong>
+                <small>Período analisado</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Atendimentos</span>
+                <strong id="relatorioAtendimentos">0</strong>
+                <small>Total</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Finalizados</span>
+                <strong id="relatorioFinalizados">0</strong>
+                <small>Concluídos</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Cancelados</span>
+                <strong id="relatorioCancelados">0</strong>
+                <small>Perdidos</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Ticket Médio</span>
+                <strong id="relatorioTicket">R$ 0,00</strong>
+                <small>Por atendimento</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Cancelamento</span>
+                <strong id="relatorioTaxaCancelamento">0%</strong>
+                <small>Taxa do período</small>
+            </div>
+        </section>
+
+        <section class="top-servicos-card">
+            <h3>Profissional Destaque</h3>
+            <div id="relatorioProfissionalDestaque"></div>
+        </section>
+
+        <section class="top-servicos-card">
+            <h3>Serviço Mais Vendido</h3>
+            <div id="relatorioServicoDestaque"></div>
+        </section>
+
+        <section class="top-servicos-card">
+            <h3>Ranking de Profissionais</h3>
+            <div id="relatorioRankingProfissionais"></div>
+        </section>
+
+        <section class="top-servicos-card">
+            <h3>Ranking de Serviços</h3>
+            <div id="relatorioRankingServicos"></div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="relatorios.js"></script>
+
+</body>
+</html>

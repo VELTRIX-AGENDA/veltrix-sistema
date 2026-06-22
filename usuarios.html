@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Usuários - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Usuários</h1>
+                <p>Controle de acesso da VELTRIX</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Gerenciar Acessos</h2>
+            <p>Crie usuários, defina perfis e controle permissões.</p>
+        </section>
+
+        <section class="mobile-form">
+            <div class="form-section">
+
+                <h3>Novo Usuário</h3>
+
+                <label>Nome</label>
+                <input type="text" id="nomeUsuario" placeholder="Nome do usuário">
+
+                <label>Email</label>
+                <input type="email" id="emailUsuario" placeholder="email@empresa.com">
+
+                <label>Senha</label>
+<div class="senha-container" style="position: relative; display: flex; align-items: center; width: 100%; box-sizing: border-box;">
+    <input type="password" id="senhaUsuario" placeholder="Senha de acesso" style="width: 100%; padding-right: 40px; box-sizing: border-box;">
+    <span id="btnToggleSenhaUsuario" onclick="alternarVisibilidadeSenha()" style="position: absolute; right: 12px; color: #8a8a93; cursor: pointer; font-size: 16px; padding: 5px; z-index: 999; user-select: none;">
+        👁️
+    </span>
+</div>
+
+                <label>Perfil</label>
+                <select id="perfilUsuario">
+                    <option value="">Selecione um perfil</option>
+                    <option value="Proprietario">Proprietário</option>
+                    <option value="Gerente">Gerente</option>
+                    <option value="Profissional">Profissional</option>
+                </select>
+
+                <button id="btnSalvarUsuario" class="primary-action">
+                    Salvar Usuário
+                </button>
+
+            </div>
+        </section>
+
+        <section class="mobile-list">
+            <h2>Usuários Cadastrados</h2>
+            <div id="listaUsuarios"></div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="utils.js"></script>
+    <script src="usuarios.js"></script>
+
+</body>
+</html>

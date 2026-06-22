@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELTRIX - Autenticação</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <style>
+        :root {
+            --bg-principal: #09090b;
+            --bg-card: #141416;
+            --cor-borda: #27272a;
+            --cor-borda-foco: #2cc185;
+            --cor-texto: #f4f4f5;
+            --cor-texto-secundario: #8a8a93;
+            --cor-alerta: #eab308;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--cor-texto);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container-auth {
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+            letter-spacing: 2px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .logo-area span {
+            color: var(--cor-borda-foco);
+        }
+
+        .logo-area p {
+            color: var(--cor-texto-secundario);
+            font-size: 12px;
+            margin-bottom: 25px;
+        }
+
+        .card-form {
+            background-color: var(--bg-card);
+            border: 1px solid var(--cor-borda);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: left;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            color: var(--cor-texto);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        input {
+            width: 100%;
+            background-color: #1d1d20;
+            border: 1px solid var(--cor-borda);
+            border-radius: 6px;
+            padding: 12px;
+            color: var(--cor-texto);
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        input:focus {
+            border-color: var(--cor-borda-foco);
+        }
+
+        .btn-toggle-senha {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--cor-texto-secundario);
+        }
+
+        /* Medidor de Força da Senha */
+        .container-requisitos {
+            margin-top: -10px;
+            margin-bottom: 20px;
+        }
+
+        .wrapper-barra {
+            width: 100%;
+            height: 4px;
+            background-color: #27272a;
+            border-radius: 2px;
+            margin-bottom: 6px;
+            overflow: hidden;
+        }
+
+        .barra-forca {
+            width: 0%;
+            height: 100%;
+            background-color: #ef4444;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .texto-ajuda {
+            font-size: 11px;
+            color: var(--cor-texto-secundario);
+            line-height: 1.4;
+        }
+
+        /* Botões */
+        .btn-principal {
+            width: 100%;
+            background-color: var(--cor-borda-foco);
+            color: #000;
+            border: none;
+            border-radius: 6px;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-principal:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-principal:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .alternar-modo-container {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--cor-texto-secundario);
+        }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: var(--cor-texto);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-left: 5px;
+        }
+
+        /* Estilos do Alerta de Spam solicitado */
+        .alerta-spam {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: rgba(234, 179, 8, 0.1);
+            border: 1px solid rgba(234, 179, 8, 0.2);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 20px;
+            color: var(--cor-alerta);
+            font-size: 12px;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .btn-voltar {
+            background: none;
+            border: none;
+            color: var(--cor-texto-secundario);
+            font-size: 13px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-voltar:hover {
+            color: var(--cor-texto);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-auth">
+        <div class="logo-area">
+            <h1 id="auth-title">Acessar Conta</h1>
+            <p id="auth-desc">Entre na sua conta da plataforma</p>
+        </div>
+
+        <div class="card-form" id="secaoCredenciais">
+            <form onsubmit="return false;">
+                
+                <div class="form-group" id="grupoNome" style="display: none;">
+                    <label for="regNome">Seu Nome</label>
+                    <input type="text" id="regNome" placeholder="Ex: Jamil Lopes">
+                </div>
+
+                <div class="form-group" id="grupoEmpresa" style="display: none;">
+                    <label for="regEmpresa">Nome do Estabelecimento</label>
+                    <input type="text" id="regEmpresa" placeholder="Ex: Barbearia Premium">
+                </div>
+
+                <div class="form-group">
+                    <label for="regEmail">E-mail Corporativo</label>
+                    <input type="email" id="regEmail" placeholder="seu@email.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="regSenha">Senha</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="regSenha" placeholder="••••••••" required>
+                        <button type="button" class="btn-toggle-senha" id="btnToggleSenha">👁️</button>
+                    </div>
+                </div>
+
+                <div class="container-requisitos" id="containerRequisitosSenha" style="display: none;">
+                    <div class="wrapper-barra">
+                        <div class="barra-forca" id="barraForcaSenha"></div>
+                    </div>
+                    <p class="texto-ajuda" id="textoRequisitosSenha">
+                        A senha deve ter no mínimo 6 caracteres, 1 letra maiúscula e não ser sequencial (ex: 123) ou repetida (ex: 111).
+                    </p>
+                </div>
+
+                <button type="button" class="btn-principal" id="btnEnviarCodigo">Entrar Direto</button>
+            </form>
+
+            <div class="alternar-modo-container">
+                <span id="textoAlternar">Não tem uma conta?</span>
+                <button type="button" class="btn-link" id="btnAlternarModo">Cadastre-se</button>
+            </div>
+        </div>
+
+        <div class="card-form" id="secaoVerificacao" style="display: none; border-color: var(--cor-borda-foco);">
+            <form onsubmit="return false;">
+                <div class="form-group">
+                    <label style="color: var(--cor-borda-foco); font-size: 16px; margin-bottom: 5px;">🔒 Verifique seu E-mail</label>
+                    <p class="texto-ajuda" style="margin-bottom: 15px;">
+                        Enviamos um código numérico de 6 dígitos para o endereço informado.
+                    </p>
+                </div>
+
+                <div class="alerta-spam">
+                    <span>⚠️</span>
+                    <p>
+                        <strong>Importante:</strong> Se o código não aparecer na sua caixa de entrada em instantes, por favor cheque a sua pasta de <strong>Spam</strong> ou <strong>Lixo Eletrônico</strong>.
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="codigoInput">Código de Verificação</label>
+                    <input type="text" id="codigoInput" placeholder="Ex: 123456" maxlength="6" style="text-align: center; font-size: 22px; letter-spacing: 6px; font-weight: bold;">
+                </div>
+
+                <button type="button" class="btn-principal" id="btnConfirmarCadastro">Confirmar e Criar Conta</button>
+                <button type="button" class="btn-voltar" id="btnVoltar">← Voltar e alterar e-mail</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="auth.js"></script>
+</body>
+</html>

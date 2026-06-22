@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container dashboard-modern">
+
+        <header class="app-header">
+            <div class="hamburger-container">
+                <button class="hamburger-button" onclick="abrirMenu()">☰</button>
+            </div>
+
+            <div class="logo-mark">V</div>
+
+            <div>
+                <h1 id="nomeEmpresaHeader">VELTRIX</h1>
+                <p id="usuarioInfo">Agenda inteligente para negócios modernos</p>
+            </div>
+        </header>
+
+        <section class="dashboard-hero compact-hero">
+            <span id="nomeEmpresaPainel">PAINEL DE CONTROLE</span>
+            <h2>Seu negócio no controle.</h2>
+            <p>Agenda inteligente, equipe organizada e gestão em tempo real.</p>
+        </section>
+
+        <section class="dashboard-stats">
+            <div class="stat-card">
+                <span>Hoje</span>
+                <strong id="totalHoje">0</strong>
+                <small>Atendimentos</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Agora</span>
+                <strong id="emAtendimento">0</strong>
+                <small>Em atendimento</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Finalizados</span>
+                <strong id="finalizadosHoje">0</strong>
+                <small>Hoje</small>
+            </div>
+
+            <div class="stat-card destaque acesso-admin">
+                <span>Faturamento</span>
+                <strong id="faturamentoHoje">R$ 0</strong>
+                <small>Realizado hoje</small>
+            </div>
+
+            <div class="stat-card acesso-admin">
+                <span>VIP</span>
+                <strong id="clientesVip">0</strong>
+                <small>Clientes 💎</small>
+            </div>
+
+            <div class="stat-card acesso-admin">
+                <span>MASTER</span>
+                <strong id="clientesRubi">0</strong>
+                <small>Clientes 👑</small>
+            </div>
+
+            <div class="stat-card destaque acesso-admin">
+                <span>Top Profissional</span>
+                <strong id="melhorProfissional">-</strong>
+                <small>Melhor resultado hoje</small>
+            </div>
+        </section>
+
+        <section class="next-card">
+            <span>Próximo Atendimento</span>
+            <h2 id="proximoCliente">Nenhum atendimento próximo</h2>
+            <p id="proximoDetalhes">A agenda está livre no momento.</p>
+        </section>
+
+        <section class="dashboard-active">
+            <h2>Atendimentos Ativos</h2>
+            <div id="dashboardAtivos"></div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html" class="acesso-admin">👥</a>
+        <a href="gestao.html" class="acesso-admin">📊</a>
+    </nav>
+
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
+
+    <aside id="sidebarMenu" class="sidebar-menu">
+        <h2 id="nomeEmpresaSidebar">VELTRIX</h2>
+
+        <a href="dashboard.html">Início</a>
+        <a href="agenda.html">Agenda Geral</a>
+        <a href="agendamentos.html">Novo Agendamento</a>
+
+        <a class="acesso-admin" href="barbeiros.html">Profissionais</a>
+        <a class="acesso-admin" href="servicos.html">Serviços</a>
+        <a class="acesso-admin" href="clientes.html">Clientes</a>
+        <a class="acesso-admin" href="financeiro.html">Financeiro</a>
+        <a class="acesso-admin" href="relatorios.html">Relatórios</a>
+        <a class="acesso-admin" href="usuarios.html">Usuários</a>
+
+        <a href="#" onclick="sairSistema()">Sair</a>
+    </aside>
+
+    <script src="auth.js"></script>
+    <script src="dashboard.js"></script>
+
+    <script>
+        const usuarioAtual = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+        if (usuarioAtual) {
+            // Injeta o nome do usuário e perfil
+            document.getElementById("usuarioInfo").innerText = usuarioAtual.nome + " • " + usuarioAtual.perfil;
+            
+            // Se houver empresa cadastrada no login, customiza a interface inteira com o nome do estabelecimento
+            if (usuarioAtual.empresa) {
+                document.getElementById("nomeEmpresaHeader").innerText = usuarioAtual.empresa.toUpperCase();
+                document.getElementById("nomeEmpresaSidebar").innerText = usuarioAtual.empresa.toUpperCase();
+                document.getElementById("nomeEmpresaPainel").innerText = "PAINEL • " + usuarioAtual.empresa.toUpperCase();
+            }
+        }
+
+        function abrirMenu() {
+            document.getElementById("sidebarMenu").classList.add("ativo");
+            document.getElementById("sidebarOverlay").classList.add("ativo");
+        }
+
+        function fecharMenu() {
+            document.getElementById("sidebarMenu").classList.remove("ativo");
+            document.getElementById("sidebarOverlay").classList.remove("ativo");
+        }
+
+        function sairSistema() {
+            localStorage.removeItem("usuarioLogado");
+            window.location.href = "index.html";
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profissionais - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Profissionais</h1>
+                <p>Equipe visual da operação</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Equipe VELTRIX</h2>
+            <p>Cadastre profissionais com foto e organize sua equipe de forma visual.</p>
+        </section>
+
+        <section class="profissionais-grid" id="listaBarbeiros" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px;">
+        </section>
+
+        <section class="mobile-form" id="formProfissional" style="display: none;">
+            <div class="form-section">
+
+                <h3>Novo Profissional</h3>
+
+                <label for="nomeBarbeiro">Nome do Profissional</label>
+                <input type="text" id="nomeBarbeiro" placeholder="Nome do Profissional">
+
+                <label for="fotoBarbeiro">Foto do Profissional</label>
+                <input type="file" id="fotoBarbeiro" accept="image/*">
+
+                <button id="btnAdicionarBarbeiro" class="primary-action">
+                    Salvar Profissional
+                </button>
+
+            </div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="utils.js"></script>
+    <script src="auth.js"></script>
+    <script src="barbeiros.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELTRIX Command Center</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>VELTRIX COMMAND</h1>
+                <p>Centro de comando da operação</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Visão Executiva</h2>
+            <p>
+                Monitore resultados, equipe, clientes,
+                metas e crescimento em tempo real.
+            </p>
+        </section>
+
+        <section class="dashboard-stats">
+
+            <div class="stat-card destaque">
+                <span>Hoje</span>
+                <strong id="gestaoHoje">0</strong>
+                <small>Atendimentos</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Faturamento Hoje</span>
+                <strong id="gestaoFaturamentoHoje">R$ 0</strong>
+                <small>Realizado</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Faturamento Mês</span>
+                <strong id="gestaoFaturamentoMes">R$ 0</strong>
+                <small>Acumulado</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Ticket Médio</span>
+                <strong id="gestaoTicket">R$ 0</strong>
+                <small>Por atendimento</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Clientes VIP</span>
+                <strong id="gestaoVip">0</strong>
+                <small>Recorrentes</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Clientes RUBI</span>
+                <strong id="gestaoRubi">0</strong>
+                <small>Elite</small>
+            </div>
+
+        </section>
+
+        <section class="hero-card">
+            <h2>Saúde da Operação</h2>
+        </section>
+
+        <section class="dashboard-stats">
+
+            <div class="stat-card">
+                <span>Cancelamentos</span>
+                <strong id="gestaoCancelamentos">0%</strong>
+                <small>Taxa</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Retorno</span>
+                <strong id="gestaoRetorno">0%</strong>
+                <small>Clientes</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Top Profissional</span>
+                <strong id="gestaoTopProfissional">-</strong>
+                <small>Maior resultado</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Top Serviço</span>
+                <strong id="gestaoTopServico">-</strong>
+                <small>Mais vendido</small>
+            </div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Alertas Inteligentes</h3>
+
+            <div id="gestaoAlertas">
+
+                <div class="servico-ranking">
+                    <strong>✅ Sistema operacional</strong>
+                    <span>Nenhum alerta crítico</span>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Meta Mensal</h3>
+
+            <label for="metaGestao">Meta de Faturamento</label>
+            <input
+                type="number"
+                id="metaGestao"
+                placeholder="Ex: 10000"
+            >
+
+            <button
+                id="btnSalvarMetaGestao"
+                class="primary-action"
+            >
+                Salvar Meta
+            </button>
+
+            <div id="resultadoMetaGestao" style="margin-top: 10px; font-size: 14px; color: #8a8a93;">
+                Meta não configurada.
+            </div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Automação de Retenção (Recorrência)</h3>
+            
+            <p style="font-size: 13px; color: #8a8a93; margin-bottom: 12px; line-height: 1.4;">
+                Defina o limite máximo de dias que um cliente pode ficar sem agendar antes de o sistema considerá-lo inativo e sugerir o envio do lembrete de retorno.
+            </p>
+
+            <label for="diasRecorrencia">Lembrar cliente após (Dias)</label>
+            <input
+                type="number"
+                id="diasRecorrencia"
+                placeholder="Ex: 20"
+                min="1"
+            >
+
+            <button
+                id="btnSalvarRecorrencia"
+                class="primary-action"
+                style="background-color: #2cc185;"
+            >
+                Salvar Regra de Retenção
+            </button>
+
+            <div id="statusRetencao" style="margin-top: 15px; padding: 12px; background: #26262b; border-radius: 8px; font-size: 14px; border-left: 4px solid #2cc185;">
+                Carregando indicadores de saúde da carteira...
+            </div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Ranking de Profissionais</h3>
+
+            <div id="rankingProfissionais"></div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Ranking de Serviços</h3>
+
+            <div id="rankingServicos"></div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Top Clientes</h3>
+
+            <div id="rankingClientes"></div>
+
+        </section>
+
+        <section class="hero-card">
+            <h2>Central de Operações</h2>
+        </section>
+
+        <section class="app-grid">
+
+            <a class="app-card" href="financeiro.html">
+                <strong>💰 Financeiro</strong>
+                <span>Lucro, despesas e faturamento</span>
+            </a>
+
+            <a class="app-card" href="relatorios.html">
+                <strong>📈 Relatórios</strong>
+                <span>Indicadores avançados</span>
+            </a>
+
+            <a class="app-card" href="clientes.html">
+                <strong>👤 Clientes</strong>
+                <span>Histórico e fidelização</span>
+            </a>
+
+            <a class="app-card" href="agenda.html">
+                <strong>📅 Agenda</strong>
+                <span>Controle operacional</span>
+            </a>
+
+            <a class="app-card" href="equipe.html">
+                <strong>👥 Equipe</strong>
+                <span>Gestão dos profissionais</span>
+            </a>
+
+            <a class="app-card" href="whatsapp.html">
+                <strong>📲 WhatsApp</strong>
+                <span>Automações e lembretes</span>
+            </a>
+
+            <a class="app-card" href="unidades.html">
+                <strong>🏢 Unidades</strong>
+                <span>Multiunidade</span>
+            </a>
+
+            <a class="app-card" href="configuracoes.html">
+                <strong>⚙️ Configurações</strong>
+                <span>Ajustes do sistema</span>
+            </a>
+
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="utils.js"></script>
+    <script src="auth.js"></script>
+    <script src="gestao.js"></script>
+
+</body>
+</html>

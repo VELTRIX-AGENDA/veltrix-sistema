@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Férias e Ausências - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Férias</h1>
+                <p>Controle ausências da equipe</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Férias e Ausências</h2>
+            <p>Bloqueie automaticamente períodos indisponíveis dos profissionais.</p>
+        </section>
+
+        <section class="mobile-form">
+            <div class="form-section">
+
+                <h3>Novo Período</h3>
+
+                <label>Profissional</label>
+                <select id="profissionalFerias">
+                    <option value="">Selecione um Profissional</option>
+                </select>
+
+                <label>Data Inicial</label>
+                <input type="date" id="dataInicial">
+
+                <label>Data Final</label>
+                <input type="date" id="dataFinal">
+
+                <label>Motivo</label>
+                <input type="text" id="motivo" placeholder="Motivo da Ausência">
+
+                <button id="btnSalvarFerias" class="primary-action">
+                    Salvar Período
+                </button>
+
+            </div>
+        </section>
+
+        <section class="mobile-list">
+            <h2>Períodos Cadastrados</h2>
+            <div id="listaFerias"></div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="ferias.js"></script>
+
+</body>
+</html>

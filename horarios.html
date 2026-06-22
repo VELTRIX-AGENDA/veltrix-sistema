@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Horários - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="pagina-agendamentos">
+
+    <div class="form-card">
+        <h1>VELTRIX</h1>
+        <h2>Horários dos Barbeiros</h2>
+
+        <label>Barbeiro</label>
+        <select id="barbeiroHorario">
+            <option value="">Selecione um barbeiro</option>
+        </select>
+
+        <label>Horário de Entrada</label>
+        <input type="time" id="horaEntrada">
+
+        <label>Horário de Saída</label>
+        <input type="time" id="horaSaida">
+
+        <label>Início do Intervalo</label>
+<input type="time" id="inicioIntervalo">
+
+<label>Fim do Intervalo</label>
+<input type="time" id="fimIntervalo">
+
+        <button id="btnSalvarHorario">
+            Salvar Horário
+        </button>
+
+        <br><br>
+
+        <button onclick="window.location.href='dashboard.html'">
+            Voltar ao Dashboard
+        </button>
+    </div>
+
+    <div class="lista-card">
+        <h2>Horários Cadastrados</h2>
+        <div id="listaHorarios"></div>
+    </div>
+
+    <script src="horarios.js"></script>
+
+</body>
+
+</html>

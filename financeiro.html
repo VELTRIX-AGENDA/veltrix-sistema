@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Financeiro - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Financeiro</h1>
+                <p>Resultados, lucro e desempenho</p>
+            </div>
+
+        </header>
+
+        <section class="hero-card">
+
+            <h2>Central Financeira</h2>
+
+            <p>
+                Controle faturamento, despesas,
+                lucro, rankings e metas.
+            </p>
+
+        </section>
+
+        <div class="financeiro-filtros-rapidos">
+
+            <button onclick="filtroHoje()">
+                Hoje
+            </button>
+
+            <button onclick="filtroOntem()">
+                Ontem
+            </button>
+
+            <button onclick="filtroSemana()">
+                Semana
+            </button>
+
+            <button onclick="filtroMes()">
+                Mês
+            </button>
+
+        </div>
+
+        <section class="mobile-form">
+
+            <div class="form-section">
+
+                <h3>Filtro Personalizado</h3>
+
+                <label>Data Inicial</label>
+                <input
+                    type="date"
+                    id="dataInicialFinanceiro"
+                >
+
+                <label>Data Final</label>
+                <input
+                    type="date"
+                    id="dataFinalFinanceiro"
+                >
+
+                <button
+                    id="btnFiltrarFinanceiro"
+                    class="primary-action"
+                >
+                    Filtrar Período
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="dashboard-stats">
+
+            <div class="stat-card destaque">
+                <span>Faturamento</span>
+                <strong id="faturamentoPeriodo">
+                    R$ 0,00
+                </strong>
+                <small>No período selecionado</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Despesas</span>
+                <strong id="despesasPeriodo">
+                    R$ 0,00
+                </strong>
+                <small>Saídas cadastradas</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Lucro</span>
+                <strong id="lucroPeriodo">
+                    R$ 0,00
+                </strong>
+                <small>Resultado líquido</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Margem</span>
+                <strong id="margemLucro">
+                    0%
+                </strong>
+                <small>Rentabilidade</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Finalizados</span>
+                <strong id="totalFinalizados">
+                    0
+                </strong>
+                <small>Atendimentos</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Cancelados</span>
+                <strong id="totalCancelados">
+                    0
+                </strong>
+                <small>No período</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Ticket Médio</span>
+                <strong id="ticketMedio">
+                    R$ 0,00
+                </strong>
+                <small>Por atendimento</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Clientes</span>
+                <strong id="clientesAtivos">
+                    0
+                </strong>
+                <small>Atendidos</small>
+            </div>
+
+            <div class="stat-card destaque">
+                <span>Melhor Dia</span>
+                <strong id="melhorDia">
+                    -
+                </strong>
+                <small>Maior faturamento</small>
+            </div>
+
+        </section>
+
+        <section class="mobile-form">
+
+            <div class="form-section">
+
+                <h3>Registrar Despesa</h3>
+
+                <label>Descrição</label>
+
+                <input
+                    type="text"
+                    id="descricaoDespesa"
+                    placeholder="Ex: Aluguel, energia, produtos..."
+                >
+
+                <label>Valor</label>
+
+                <input
+                    type="number"
+                    id="valorDespesa"
+                    placeholder="Ex: 150"
+                >
+
+                <label>Data</label>
+
+                <input
+                    type="date"
+                    id="dataDespesa"
+                >
+
+                <button
+                    id="btnSalvarDespesa"
+                    class="primary-action"
+                >
+                    Salvar Despesa
+                </button>
+
+            </div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Despesas do Período</h3>
+
+            <div id="listaDespesas"></div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Ranking da Equipe</h3>
+
+            <div id="topProfissionais"></div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Serviços Mais Vendidos</h3>
+
+            <div id="topServicos"></div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Clientes Destaque</h3>
+
+            <div id="topClientes"></div>
+
+        </section>
+
+        <section class="top-servicos-card">
+
+            <h3>Meta Financeira</h3>
+
+            <label>Meta de Faturamento</label>
+
+            <input
+                type="number"
+                id="metaFinanceira"
+                placeholder="Ex: 10000"
+            >
+
+            <button
+                id="btnSalvarMeta"
+                class="primary-action"
+            >
+                Salvar Meta
+            </button>
+
+            <div id="resultadoMeta"></div>
+
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+
+        <a href="dashboard.html">🏠</a>
+
+        <a href="agenda.html">📅</a>
+
+        <a
+            href="agendamentos.html"
+            class="menu-plus"
+        >
+            +
+        </a>
+
+        <a href="equipe.html">👥</a>
+
+        <a href="gestao.html">📊</a>
+
+    </nav>
+
+    <!-- SEGURANÇA -->
+
+    <script src="auth.js"></script>
+
+    <!-- FINANCEIRO -->
+
+    <script src="financeiro.js"></script>
+
+</body>
+
+</html>

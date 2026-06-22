@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Agendamento - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a id="btnVoltarHeader" class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Novo Agendamento</h1>
+                <p id="subtituloHeader">Crie atendimentos com horários inteligentes</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2 id="tituloHero">Agendar Cliente</h2>
+            <p id="textoHero">
+                Escolha o serviço, profissional, data e horário disponível.
+            </p>
+        </section>
+
+        <div id="modalSucessoCliente" class="modal-sucesso-container" style="display: none;">
+            <div class="modal-sucesso-conteudo">
+                <div class="modal-sucesso-icone">✅</div>
+                <h3>Agendamento Concluído!</h3>
+                <p>Sua vaga foi reservada com sucesso. Estamos te redirecionando de volta para o WhatsApp para confirmar seus detalhes...</p>
+            </div>
+        </div>
+
+        <section class="mobile-form">
+
+            <div class="form-section">
+                <h3>Cliente</h3>
+                <label>Nome</label>
+                <input type="text" id="nome" placeholder="Seu Nome Completo">
+
+                <label>Telefone</label>
+                <input type="text" id="telefone" placeholder="Seu WhatsApp com DDD">
+            </div>
+
+            <div class="form-section">
+                <h3>Atendimento</h3>
+                <label>Serviço</label>
+                <select id="servico">
+                    <option value="">Selecione um Serviço</option>
+                </select>
+                <p id="tempoServico" style="margin-top: 8px; color: var(--primary-color); font-weight: bold;"></p>
+
+                <label>Profissional</label>
+                <input type="hidden" id="barbeiro">
+                <div id="listaProfissionaisAgendamento" class="profissionais-grid"></div>
+            </div>
+
+            <div class="form-section">
+                <h3>Data e Horário</h3>
+                <label>Data</label>
+                <input type="date" id="data">
+
+                <label>Horários Disponíveis</label>
+                <select id="horario">
+                    <option value="">Selecione um Horário</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <h3>Observações</h3>
+                <label>Observação (Opcional)</label>
+                <input type="text" id="observacao" placeholder="Ex: Alguma restrição ou detalhe">
+            </div>
+
+            <button id="btnSalvar" class="primary-action">
+                Confirmar Agendamento
+            </button>
+
+        </section>
+
+    </main>
+
+    <nav id="menuInferiorNavegacao" class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="utils.js"></script>
+    <script src="auth.js"></script>
+    <script src="agendamentos.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VELTRIX WhatsApp Marketing</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="gestao.html">←</a>
+            <div>
+                <h1>VELTRIX WHATSAPP</h1>
+                <p>Central de Relacionamento & Retenção</p>
+            </div>
+        </header>
+
+        <section class="hero-card" style="background: linear-index(135deg, #128c7e, #075e54);">
+            <h2>Automação Assistida</h2>
+            <p>
+                Reduza o No-Show em até 95% e mantenha sua carteira de clientes sempre ativa enviando mensagens personalizadas em um clique.
+            </p>
+        </section>
+
+        <section class="top-servicos-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3>⏰ Lembretes Próximos (1h antes)</h3>
+                <span id="badgeHoje" class="badge-contador" style="background: #3498db; padding: 2px 8px; border-radius: 12px; font-size: 12px;">0</span>
+            </div>
+            <p style="font-size: 12px; color: #8a8a93; margin-bottom: 12px;">
+                Clientes agendados para hoje que precisam confirmar ou lembrar do horário nas próximas horas.
+            </p>
+            
+            <div id="listaLembretesHoje">
+                </div>
+        </section>
+
+        <section class="top-servicos-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3>🏃‍♂️ Recuperação de Carteira</h3>
+                <span id="badgeSumidos" class="badge-contador" style="background: #e74c3c; padding: 2px 8px; border-radius: 12px; font-size: 12px;">0</span>
+            </div>
+            <p id="textoExplicativoRegra" style="font-size: 12px; color: #8a8a93; margin-bottom: 12px;">
+                Clientes que realizaram o último procedimento há mais de X dias e ainda não agendaram um retorno.
+            </p>
+            
+            <div id="listaClientesSumidos">
+                </div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="auth.js"></script>
+    <script src="whatsapp.js"></script>
+</body>
+</html>

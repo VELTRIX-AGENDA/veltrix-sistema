@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Agenda Geral - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Agenda Geral</h1>
+                <p>Controle operacional dos atendimentos</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Agenda Inteligente</h2>
+            <p>Visualize, acompanhe e edite atendimentos rapidamente.</p>
+        </section>
+
+        <!-- EDIÇÃO DE AGENDAMENTO -->
+
+        <section
+            id="boxEditarAgendamento"
+            class="mobile-form"
+            style="display:none;"
+        >
+
+            <div class="form-section">
+
+                <h3>Editar Agendamento</h3>
+
+                <label>Nome</label>
+                <input type="text" id="editNome">
+
+                <label>Telefone</label>
+                <input type="text" id="editTelefone">
+
+                <label>Serviço</label>
+                <select id="editServico"></select>
+
+                <label>Profissional</label>
+                <select id="editProfissional"></select>
+
+                <label>Data</label>
+                <input type="date" id="editData">
+
+                <label>Horário</label>
+                <select id="editHorario"></select>
+
+                <label>Observação</label>
+                <input type="text" id="editObservacao">
+
+                <button
+                    class="primary-action"
+                    onclick="salvarEdicaoAgendamento()"
+                >
+                    Salvar Alterações
+                </button>
+
+                <button onclick="cancelarEdicaoAgendamento()">
+                    Cancelar Edição
+                </button>
+
+            </div>
+
+        </section>
+
+        <!-- RESUMO -->
+
+        <section class="dashboard-stats">
+
+            <div class="stat-card">
+                <span>Total</span>
+                <strong id="agendaTotal">0</strong>
+                <small>Agendamentos</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Ativos</span>
+                <strong id="agendaAtivos">0</strong>
+                <small>Em aberto</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Finalizados</span>
+                <strong id="agendaFinalizados">0</strong>
+                <small>Concluídos</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Cancelados</span>
+                <strong id="agendaCancelados">0</strong>
+                <small>Cancelados</small>
+            </div>
+
+        </section>
+
+        <!-- FILTROS RÁPIDOS -->
+
+        <div class="financeiro-filtros-rapidos">
+
+            <button onclick="filtroHoje()">
+                Hoje
+            </button>
+
+            <button onclick="filtroAmanha()">
+                Amanhã
+            </button>
+
+            <button onclick="filtroSemana()">
+                Semana
+            </button>
+
+            <button onclick="filtroTodos()">
+                Todos
+            </button>
+
+        </div>
+
+        <!-- FILTROS -->
+
+        <section class="mobile-form">
+
+            <div class="form-section">
+
+                <label>Profissional</label>
+
+                <select id="filtroProfissional">
+                    <option value="">
+                        Todos os profissionais
+                    </option>
+                </select>
+
+                <label>Status</label>
+
+                <select id="filtroStatus">
+
+                    <option value="ativos">
+                        Ativos
+                    </option>
+
+                    <option value="Agendado">
+                        Agendados
+                    </option>
+
+                    <option value="Em Atendimento">
+                        Em Atendimento
+                    </option>
+
+                    <option value="Finalizado">
+                        Finalizados
+                    </option>
+
+                    <option value="Cancelado">
+                        Cancelados
+                    </option>
+
+                    <option value="todos">
+                        Todos
+                    </option>
+
+                </select>
+
+            </div>
+
+        </section>
+
+        <!-- LISTA -->
+
+        <section class="mobile-list">
+
+            <div id="listaAgenda"></div>
+
+        </section>
+
+    </main>
+
+    <!-- MENU INFERIOR -->
+
+    <nav class="bottom-menu">
+
+        <a href="dashboard.html">🏠</a>
+
+        <a href="agenda.html">📅</a>
+
+        <a href="agendamentos.html" class="menu-plus">
+            +
+        </a>
+
+        <a href="equipe.html">👥</a>
+
+        <a href="gestao.html">📊</a>
+
+    </nav>
+
+    <script src="utils.js"></script>
+    <script src="auth.js"></script>
+    <script src="agenda.js"></script>
+
+</body>
+</html>

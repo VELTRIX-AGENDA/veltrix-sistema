@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Clientes - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Clientes</h1>
+                <p>CRM inteligente da VELTRIX</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Clientes Inteligentes</h2>
+            <p>Pesquise, acompanhe visitas e identifique VIPs e RUBI.</p>
+        </section>
+
+        <section class="mobile-form">
+            <div class="form-section">
+
+                <h3>Novo Cliente</h3>
+
+                <label>Nome do Cliente</label>
+                <input type="text" id="nomeCliente" placeholder="Nome do Cliente">
+
+                <label>Telefone do Cliente</label>
+                <input type="text" id="telefoneCliente" placeholder="Telefone do Cliente">
+
+                <label>Observações</label>
+                <input type="text" id="observacaoCliente" placeholder="Observações do Cliente">
+
+                <button id="btnSalvarCliente" class="primary-action">
+                    Salvar Cliente
+                </button>
+
+            </div>
+        </section>
+
+        <section class="mobile-form">
+            <div class="form-section">
+                <h3>Pesquisar Cliente</h3>
+
+                <input
+                    type="text"
+                    id="pesquisarCliente"
+                    placeholder="Pesquisar por nome"
+                >
+            </div>
+        </section>
+
+        <section class="mobile-list">
+            <h2>Clientes Cadastrados</h2>
+            <div id="listaClientes"></div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="clientes.js"></script>
+
+</body>
+</html>

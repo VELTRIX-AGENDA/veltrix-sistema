@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serviços - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Serviços</h1>
+                <p>Configure os atendimentos da operação</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Catálogo de Serviços</h2>
+            <p>Defina nome, duração e valor de cada serviço.</p>
+        </section>
+
+        <section class="mobile-form">
+            <div class="form-section">
+
+                <h3>Novo Serviço</h3>
+
+                <label for="nomeServico">Nome do Serviço</label>
+                <input type="text" id="nomeServico" placeholder="Nome do Serviço">
+
+                <label for="duracaoServico">Duração em Minutos</label>
+                <input type="number" id="duracaoServico" placeholder="Ex: 30">
+
+                <label for="precoServico">Valor do Serviço</label>
+                <input type="number" id="precoServico" placeholder="Ex: 40">
+
+                <button id="btnAdicionarServico" class="primary-action">
+                    Salvar Serviço
+                </button>
+
+            </div>
+        </section>
+
+        <section class="mobile-form">
+            <div class="form-section">
+                <h3>Pesquisar Serviço</h3>
+                <input type="text" id="pesquisarServico" placeholder="Pesquisar por nome">
+            </div>
+        </section>
+
+        <section class="mobile-list">
+            <h2>Serviços Cadastrados</h2>
+            <div id="listaServicos"></div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="utils.js"></script>
+    <script src="auth.js"></script>
+    <script src="servicos.js"></script>
+
+</body>
+</html>

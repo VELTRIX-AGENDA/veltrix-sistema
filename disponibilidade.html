@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Disponibilidade - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Disponibilidade</h1>
+                <p>Defina os horários da equipe</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Disponibilidade Semanal</h2>
+            <p>Configure dias, horários e intervalos dos profissionais.</p>
+        </section>
+
+        <section class="mobile-form">
+            <div class="form-section">
+
+                <h3>Nova Disponibilidade</h3>
+
+                <label>Profissional</label>
+                <select id="barbeiroDisponibilidade">
+                    <option value="">Selecione um Profissional</option>
+                </select>
+
+                <label>Dias da Semana</label>
+
+                <div class="dias-grid">
+                    <label><input type="checkbox" value="Segunda" class="dia"> Seg</label>
+                    <label><input type="checkbox" value="Terça" class="dia"> Ter</label>
+                    <label><input type="checkbox" value="Quarta" class="dia"> Qua</label>
+                    <label><input type="checkbox" value="Quinta" class="dia"> Qui</label>
+                    <label><input type="checkbox" value="Sexta" class="dia"> Sex</label>
+                    <label><input type="checkbox" value="Sábado" class="dia"> Sáb</label>
+                    <label><input type="checkbox" value="Domingo" class="dia"> Dom</label>
+                </div>
+
+                <label>Horário Inicial</label>
+                <input type="time" id="entrada">
+
+                <label>Horário Final</label>
+                <input type="time" id="saida">
+
+                <label>Início do Intervalo</label>
+                <input type="time" id="inicioIntervalo">
+
+                <label>Fim do Intervalo</label>
+                <input type="time" id="fimIntervalo">
+
+                <button id="btnSalvarDisponibilidade" class="primary-action">
+                    Salvar Disponibilidade
+                </button>
+
+            </div>
+        </section>
+
+        <section class="mobile-list">
+            <h2>Disponibilidades Cadastradas</h2>
+            <div id="listaDisponibilidades"></div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="disponibilidade.js"></script>
+
+</body>
+</html>

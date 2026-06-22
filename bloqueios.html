@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Bloqueios - VELTRIX</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="app-page">
+
+    <main class="app-container">
+
+        <header class="app-header">
+            <a class="back-button" href="#" onclick="history.back()">←</a>
+
+            <div>
+                <h1>Bloqueios</h1>
+                <p>Bloqueie horários específicos</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <h2>Bloqueios Especiais</h2>
+            <p>Impeça agendamentos em horários ocupados, eventos ou compromissos.</p>
+        </section>
+
+        <section class="mobile-form">
+            <div class="form-section">
+
+                <h3>Novo Bloqueio</h3>
+
+                <label>Profissional</label>
+                <select id="barbeiroBloqueio">
+                    <option value="">Selecione um Profissional</option>
+                </select>
+
+                <label>Data do Bloqueio</label>
+                <input type="date" id="dataBloqueio">
+
+                <label>Horário Inicial</label>
+                <input type="time" id="horaInicial">
+
+                <label>Horário Final</label>
+                <input type="time" id="horaFinal">
+
+                <label>Motivo</label>
+                <input type="text" id="motivo" placeholder="Motivo do Bloqueio">
+
+                <button id="btnSalvarBloqueio" class="primary-action">
+                    Salvar Bloqueio
+                </button>
+
+            </div>
+        </section>
+
+        <section class="mobile-list">
+            <h2>Bloqueios Cadastrados</h2>
+            <div id="listaBloqueios"></div>
+        </section>
+
+    </main>
+
+    <nav class="bottom-menu">
+        <a href="dashboard.html">🏠</a>
+        <a href="agenda.html">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
+        <a href="equipe.html">👥</a>
+        <a href="gestao.html">📊</a>
+    </nav>
+
+    <script src="bloqueios.js"></script>
+
+</body>
+</html>
