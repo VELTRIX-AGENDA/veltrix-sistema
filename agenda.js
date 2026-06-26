@@ -408,23 +408,28 @@ function enviarWhatsApp(event, posicao) {
     let telefone = agendamento.telefone.replace(/\D/g, "");
     if (!telefone.startsWith("55")) telefone = "55" + telefone;
 
-    // 1. Captura dinâmica do título do negócio renderizado no topo da página (ex: WR BARBER)
-    let nomeEmpresa = "Nosso Estabelecimento";
-    const elementoTitulo = document.querySelector("h1") || document.querySelector(".dashboard-card h2");
+    // CAPTURA 100% DINÂMICA DA EMPRESA:
+    // Tenta pegar do localStorage do usuário logado ou dos dados gerais da empresa salvos no sistema
+    const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+    const dadosEmpresa = JSON.parse(localStorage.getItem("dadosEmpresa")) || {};
     
-    if (elementoTitulo && elementoTitulo.innerText.trim() !== "") {
-        nomeEmpresa = elementoTitulo.innerText.trim();
-    } else {
-        // Fallback secundário baseado no localStorage local do usuário conectado
-        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
-        if (usuarioLogado.nomeEmpresa) {
-            nomeEmpresa = usuarioLogado.nomeEmpresa;
-        } else if (document.body.innerText.includes("WR BARBER")) {
-            nomeEmpresa = "WR BARBER";
+    // Procura o nome em várias possibilidades dinâmicas configuradas no sistema. 
+    // Se não encontrar nenhuma, lê o que está escrito no topo da página.
+    let nomeEmpresa = usuarioLogado.nomeEmpresa || 
+                      usuarioLogado.empresa || 
+                      dadosEmpresa.nome || 
+                      dadosEmpresa.nomeFantasia;
+
+    if (!nomeEmpresa) {
+        const elementoTitulo = document.querySelector("h1") || document.querySelector(".dashboard-card h2");
+        if (elementoTitulo && elementoTitulo.innerText.trim() !== "") {
+            nomeEmpresa = elementoTitulo.innerText.trim();
+        } else {
+            nomeEmpresa = "Nossa Empresa"; // Fallback de segurança caso tudo falhe
         }
     }
 
-    // 2. Montagem da string limpa utilizando quebras de linha nativas do sistema (\n)
+    // CONSTRUÇÃO RESTRITA DA MENSAGEM COM QUEBRAS NATIVAS
     const mensagem = `Olá ${agendamento.nome}.\n\n` +
                      `Seu atendimento está confirmado! ✅\n\n` +
                      `📅 Data: ${VELTRIX_UTILS.formatarDataParaExibicao(agendamento.data)}\n` +
@@ -433,7 +438,9 @@ function enviarWhatsApp(event, posicao) {
                      `💈 Profissional: ${agendamento.profissional || agendamento.barbeiro}\n\n` +
                      `Obrigado por escolher a ${nomeEmpresa}.`;
 
-    // 3. O encodeURIComponent blinda o texto e os emojis para evitar quebras em "?" ou losangos
+    // SOLUÇÃO DO COMPORTAMENTO DOS EMOJIS:
+    // O uso isolado de 'https://api.whatsapp.com/send' combinado com encodeURIComponent impede o bug dos losangos ()
     const url = "https://api.whatsapp.com/send?phone=" + telefone + "&text=" + encodeURIComponent(mensagem);
     window.open(url, "_blank");
+}
 }
