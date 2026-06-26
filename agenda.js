@@ -24,7 +24,7 @@ let indiceEditando = null;
 // Inicialização Core
 carregarProfissionais();
 carregarCamposEdicao();
-filtroHoje();
+filtroTodos(); // Configurado para trazer a listagem macro e contagem geral na abertura
 
 // Event Listeners
 if (filtroProfissional) filtroProfissional.addEventListener("change", aplicarFiltros);
@@ -112,11 +112,11 @@ function filtroSemana() {
 
 function aplicarFiltros() {
     let resultado = [...listaFiltrada];
-    const profissionalSelecionado = filtroProfissional ? filtroProfissional.value : "";
+    const profesionalSelecionado = filtroProfissional ? filtroProfissional.value : "";
     const status = filtroStatus ? filtroStatus.value : "todos";
 
-    if (profissionalSelecionado !== "") {
-        resultado = resultado.filter(item => item.barbeiro === profissionalSelecionado || item.profissional === profissionalSelecionado);
+    if (profesionalSelecionado !== "") {
+        resultado = resultado.filter(item => item.barbeiro === profesionalSelecionado || item.profissional === profesionalSelecionado);
     }
 
     if (status === "ativos") {
@@ -344,7 +344,7 @@ function obterDisponibilidadeDoDia(profissional, data) {
 
     return disponibilidades.find(item => {
         const nomeProf = item.profissional || item.barbeiro;
-        return nomeProf === profesional && item.dia === diaSemana;
+        return nomeProf === profissional && item.dia === diaSemana;
     });
 }
 
