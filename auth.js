@@ -3,6 +3,15 @@
  * Módulo: Fluxo Separado, Validação Antisequencial de Senha, Medidor de Força e Dados do Estabelecimento
  */
 
+// --- VERIFICAÇÃO DE SESSÃO PERMANENTE (LOCALSTORAGE) ---
+// Se o usuário já estiver logado e tentar acessar a página de login/cadastro, manda direto para a dashboard
+if (localStorage.getItem("usuarioLogado")) {
+    // Evita loop de redirecionamento se já estiver na dashboard ou páginas internas
+    if (window.location.pathname.includes("index.html") || window.location.pathname.endsWith("/") || window.location.pathname.includes("login")) {
+        window.location.href = "dashboard.html";
+    }
+}
+
 // 1. INICIALIZAÇÃO DO EMAILJS
 emailjs.init({
     publicKey: "JM2E6ko8vRLfYh1Ty", // Sua chave pública ativa
@@ -198,6 +207,7 @@ function processarAutenticacao(e) {
             empresa: usuarioExistente.empresa || "Estabelecimento"
         };
 
+        // Salva de forma persistente no localStorage
         localStorage.setItem("usuarioLogado", JSON.stringify(estruturaSessao));
         alert("Login efetuado com sucesso! Redirecionando...");
         window.location.href = "dashboard.html";
@@ -300,7 +310,7 @@ function validarCodigoEEntrar() {
     usuarios.push(novoUsuario);
     localStorage.setItem("veltrix_usuarios", JSON.stringify(usuarios));
 
-    // Salva a sessão ativa vinculando e transportando os dados para o Dashboard
+    // Salva de forma permanente vinculando e transportando os dados para o Dashboard
     const estruturaSessao = {
         nome: dadosTemporarios.nome,
         perfil: "Administrador",
@@ -325,3 +335,16 @@ function alternarTelas(mostrarVerificacao) {
         if (inputCodigo) inputCodigo.value = "";
     }
 }
+
+/**
+ * FUNÇÃO DE LOGOUT COMPLETA E EXPLICITA
+ * Remove a sessão e redireciona o usuário de volta à tela de login/index
+ */
+function fazerLogout() {
+    localStorage.removeItem("usuarioLogado");
+    alert("Sessão encerrada com sucesso.");
+    window.location.href = "index.html"; // ou o nome da sua página de login principal
+}
+
+// Expõe a função para ser chamada via HTML (ex: onclick="fazerLogout()")
+window.fazerLogout = fazerLogout;
