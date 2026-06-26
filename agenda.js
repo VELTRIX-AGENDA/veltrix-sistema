@@ -104,7 +104,7 @@ function filtroSemana() {
 
 function aplicarFiltros() {
     let resultado = [...listaFiltrada];
-    const profesional = filtroProfissional.value; // Corrigido nomenclatura para bater com a condicional
+    const profesional = filtroProfissional.value;
     const status = filtroStatus.value;
 
     if (profesional !== "") {
@@ -282,12 +282,12 @@ function gerarHorariosEdicao(horarioAtual = "") {
         const inicioNovo = inicio;
         const fimNovo = inicioNovo + tempo;
 
-        const dentroIntervalo = conflitaComIntervalo(inicioNovo, fimNovo, disponibilidad);
+        const dentroIntervalo = conflitaComIntervalo(inicioNovo, fimNovo, disponibilidade);
 
         const ocupado = agendamentos.some((item, index) => {
             if (index === indiceEditando) return false;
             const nomeProf = item.profissional || item.barbeiro;
-            if (nomeProf !== profissional || item.data !== data) return false;
+            if (nomeProf !== profesional || item.data !== data) return false;
 
             const inicioAgendamento = converterHorarioParaMinutos(item.horario);
             const fimAgendamento = inicioAgendamento + Number(item.tempo);
@@ -394,7 +394,7 @@ function converterMinutosParaHorario(minutosTotais) {
 }
 
 /* =======================================================
-   CORREÇÃO PREMIUM: WHATSAPP DINÂMICO E SEM EMOJIS QUEBRADOS
+   REVISÃO ULTRAPREMIUM: MENSAGEM DINÂMICA DO WHATSAPP (CORRIGIDA)
    ======================================================= */
 function enviarWhatsApp(event, posicao) {
     event.stopPropagation();
@@ -408,11 +408,23 @@ function enviarWhatsApp(event, posicao) {
     let telefone = agendamento.telefone.replace(/\D/g, "");
     if (!telefone.startsWith("55")) telefone = "55" + telefone;
 
-    // Pega o nome do estabelecimento dinâmico do usuário logado (ex: WR BARBER)
-    const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
-    const nomeEmpresa = usuarioLogado.nomeEmpresa || "WR BARBER";
+    // 1. Captura dinâmica do título do negócio renderizado no topo da página (ex: WR BARBER)
+    let nomeEmpresa = "Nosso Estabelecimento";
+    const elementoTitulo = document.querySelector("h1") || document.querySelector(".dashboard-card h2");
+    
+    if (elementoTitulo && elementoTitulo.innerText.trim() !== "") {
+        nomeEmpresa = elementoTitulo.innerText.trim();
+    } else {
+        // Fallback secundário baseado no localStorage local do usuário conectado
+        const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+        if (usuarioLogado.nomeEmpresa) {
+            nomeEmpresa = usuarioLogado.nomeEmpresa;
+        } else if (document.body.innerText.includes("WR BARBER")) {
+            nomeEmpresa = "WR BARBER";
+        }
+    }
 
-    // Montagem da mensagem estruturada com quebras nativas (\n)
+    // 2. Montagem da string limpa utilizando quebras de linha nativas do sistema (\n)
     const mensagem = `Olá ${agendamento.nome}.\n\n` +
                      `Seu atendimento está confirmado! ✅\n\n` +
                      `📅 Data: ${VELTRIX_UTILS.formatarDataParaExibicao(agendamento.data)}\n` +
@@ -421,7 +433,7 @@ function enviarWhatsApp(event, posicao) {
                      `💈 Profissional: ${agendamento.profissional || agendamento.barbeiro}\n\n` +
                      `Obrigado por escolher a ${nomeEmpresa}.`;
 
-    // encodeURIComponent protege os emojis e espaços para não virarem "?" ou losangos ruins
+    // 3. O encodeURIComponent blinda o texto e os emojis para evitar quebras em "?" ou losangos
     const url = "https://api.whatsapp.com/send?phone=" + telefone + "&text=" + encodeURIComponent(mensagem);
     window.open(url, "_blank");
 }
