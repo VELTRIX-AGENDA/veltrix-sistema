@@ -5,7 +5,7 @@
 
 let agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
 
-// Sanetização profissional da base de dados local
+// Sanitização profissional da base de dados local
 agendamentos = agendamentos.filter(item => {
     if (!item.data) return false;
     const ano = Number(item.data.split("-")[0]);
@@ -104,10 +104,10 @@ function filtroSemana() {
 
 function aplicarFiltros() {
     let resultado = [...listaFiltrada];
-    const profissional = filtroProfissional.value;
+    const profesional = filtroProfissional.value; // Corrigido nomenclatura para bater com a condicional
     const status = filtroStatus.value;
 
-    if (profissional !== "") {
+    if (profesional !== "") {
         resultado = resultado.filter(item => item.barbeiro === profesional || item.profissional === profesional);
     }
 
@@ -216,7 +216,7 @@ function salvarEdicaoAgendamento() {
     const nome = document.getElementById("editNome").value.trim();
     const telefone = document.getElementById("editTelefone").value.trim();
     const servico = document.getElementById("editServico").value;
-    const profissional = document.getElementById("editProfissional").value;
+    const profesional = document.getElementById("editProfissional").value;
     const data = document.getElementById("editData").value;
     const horario = document.getElementById("editHorario").value;
     const observacao = document.getElementById("editObservacao").value.trim();
@@ -226,7 +226,7 @@ function salvarEdicaoAgendamento() {
     const tempo = opcaoServico.getAttribute("data-tempo");
     const preco = opcaoServico.getAttribute("data-preco");
 
-    if (!nome || !telefone || !servico || !profissional || !data || !horario) {
+    if (!nome || !telefone || !servico || !profesional || !data || !horario) {
         alert("Preencha todos os campos obrigatórios.");
         return;
     }
@@ -234,9 +234,8 @@ function salvarEdicaoAgendamento() {
     agendamentos[indiceEditando].nome = nome;
     agendamentos[indiceEditando].telefone = telefone;
     agendamentos[indiceEditando].servico = servico;
-    // Salva em ambas chaves temporariamente para retrocompatibilidade
-    agendamentos[indiceEditando].barbeiro = profissional;
-    agendamentos[indiceEditando].profissional = profissional;
+    agendamentos[indiceEditando].barbeiro = profesional;
+    agendamentos[indiceEditando].profissional = profesional;
     agendamentos[indiceEditando].data = data;
     agendamentos[indiceEditando].horario = horario;
     agendamentos[indiceEditando].observacao = observacao;
@@ -283,7 +282,7 @@ function gerarHorariosEdicao(horarioAtual = "") {
         const inicioNovo = inicio;
         const fimNovo = inicioNovo + tempo;
 
-        const dentroIntervalo = conflitaComIntervalo(inicioNovo, fimNovo, disponibilidade);
+        const dentroIntervalo = conflitaComIntervalo(inicioNovo, fimNovo, disponibilidad);
 
         const ocupado = agendamentos.some((item, index) => {
             if (index === indiceEditando) return false;
@@ -324,7 +323,7 @@ function obterDisponibilidadeDoDia(profissional, data) {
 
     return disponibilidades.find(item => {
         const nomeProf = item.profissional || item.barbeiro;
-        return nomeProf === profesional && item.dia === diaSemana;
+        return nomeProf === profissional && item.dia === diaSemana;
     });
 }
 
@@ -394,6 +393,9 @@ function converterMinutosParaHorario(minutosTotais) {
     return String(horas).padStart(2, "0") + ":" + String(minutos).padStart(2, "0");
 }
 
+/* =======================================================
+   CORREÇÃO PREMIUM: WHATSAPP DINÂMICO E SEM EMOJIS QUEBRADOS
+   ======================================================= */
 function enviarWhatsApp(event, posicao) {
     event.stopPropagation();
     const agendamento = agendamentos[posicao];
@@ -406,8 +408,20 @@ function enviarWhatsApp(event, posicao) {
     let telefone = agendamento.telefone.replace(/\D/g, "");
     if (!telefone.startsWith("55")) telefone = "55" + telefone;
 
-    const mensagem = `Olá ${agendamento.nome}.\n\nSeu atendimento está confirmado ✅\n\n📅 Data: ${VELTRIX_UTILS.formatarDataParaExibicao(agendamento.data)}\n⏰ Horário: ${agendamento.horario}\n💼 Serviço: ${agendamento.servico}\n👤 Profissional: ${agendamento.profissional || agendamento.barbeiro}\n\nObrigado por escolher a VELTRIX.`;
+    // Pega o nome do estabelecimento dinâmico do usuário logado (ex: WR BARBER)
+    const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+    const nomeEmpresa = usuarioLogado.nomeEmpresa || "WR BARBER";
 
-    const url = "https://wa.me/" + telefone + "?text=" + encodeURIComponent(mensagem);
+    // Montagem da mensagem estruturada com quebras nativas (\n)
+    const mensagem = `Olá ${agendamento.nome}.\n\n` +
+                     `Seu atendimento está confirmado! ✅\n\n` +
+                     `📅 Data: ${VELTRIX_UTILS.formatarDataParaExibicao(agendamento.data)}\n` +
+                     `⏰ Horário: ${agendamento.horario}\n` +
+                     `✂️ Serviço: ${agendamento.servico}\n` +
+                     `💈 Profissional: ${agendamento.profissional || agendamento.barbeiro}\n\n` +
+                     `Obrigado por escolher a ${nomeEmpresa}.`;
+
+    // encodeURIComponent protege os emojis e espaços para não virarem "?" ou losangos ruins
+    const url = "https://api.whatsapp.com/send?phone=" + telefone + "&text=" + encodeURIComponent(mensagem);
     window.open(url, "_blank");
 }
