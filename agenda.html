@@ -1,10 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agenda Geral - VELTRIX</title>
     <link rel="stylesheet" href="style.css">
+    
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 </head>
 
 <body class="app-page">
@@ -12,7 +15,7 @@
     <main class="app-container">
 
         <header class="app-header">
-            <a class="back-button" href="#" onclick="history.back()">←</a>
+            <a class="back-button" href="dashboard.html">←</a>
 
             <div>
                 <h1>Agenda Geral</h1>
@@ -25,13 +28,7 @@
             <p>Visualize, acompanhe e edite atendimentos rapidamente.</p>
         </section>
 
-        <!-- EDIÇÃO DE AGENDAMENTO -->
-
-        <section
-            id="boxEditarAgendamento"
-            class="mobile-form"
-            style="display:none;"
-        >
+        <section id="boxEditarAgendamento" class="mobile-form" style="display:none;">
 
             <div class="form-section">
 
@@ -58,10 +55,7 @@
                 <label>Observação</label>
                 <input type="text" id="editObservacao">
 
-                <button
-                    class="primary-action"
-                    onclick="salvarEdicaoAgendamento()"
-                >
+                <button class="primary-action" onclick="salvarEdicaoAgendamento()">
                     Salvar Alterações
                 </button>
 
@@ -72,8 +66,6 @@
             </div>
 
         </section>
-
-        <!-- RESUMO -->
 
         <section class="dashboard-stats">
 
@@ -103,8 +95,6 @@
 
         </section>
 
-        <!-- FILTROS RÁPIDOS -->
-
         <div class="financeiro-filtros-rapidos">
 
             <button onclick="filtroHoje()">
@@ -125,14 +115,11 @@
 
         </div>
 
-        <!-- FILTROS -->
-
         <section class="mobile-form">
 
             <div class="form-section">
 
                 <label>Profissional</label>
-
                 <select id="filtroProfissional">
                     <option value="">
                         Todos os profissionais
@@ -140,65 +127,43 @@
                 </select>
 
                 <label>Status</label>
-
                 <select id="filtroStatus">
-
                     <option value="ativos">
                         Ativos
                     </option>
-
                     <option value="Agendado">
                         Agendados
                     </option>
-
                     <option value="Em Atendimento">
                         Em Atendimento
                     </option>
-
                     <option value="Finalizado">
                         Finalizados
                     </option>
-
                     <option value="Cancelado">
                         Cancelados
                     </option>
-
                     <option value="todos">
                         Todos
                     </option>
-
                 </select>
 
             </div>
 
         </section>
 
-        <!-- LISTA -->
-
         <section class="mobile-list">
-
             <div id="listaAgenda"></div>
-
         </section>
 
     </main>
 
-    <!-- MENU INFERIOR -->
-
     <nav class="bottom-menu">
-
         <a href="dashboard.html">🏠</a>
-
-        <a href="agenda.html">📅</a>
-
-        <a href="agendamentos.html" class="menu-plus">
-            +
-        </a>
-
+        <a href="agenda.html" class="active">📅</a>
+        <a href="agendamentos.html" class="menu-plus">+</a>
         <a href="equipe.html">👥</a>
-
         <a href="gestao.html">📊</a>
-
     </nav>
 
     <script src="utils.js"></script>
