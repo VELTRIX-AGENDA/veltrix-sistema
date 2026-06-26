@@ -27,15 +27,19 @@ carregarCamposEdicao();
 filtroHoje();
 
 // Event Listeners
-filtroProfissional.addEventListener("change", aplicarFiltros);
-filtroStatus.addEventListener("change", aplicarFiltros);
+if (filtroProfissional) filtroProfissional.addEventListener("change", aplicarFiltros);
+if (filtroStatus) filtroStatus.addEventListener("change", aplicarFiltros);
 
-document.getElementById("editServico").addEventListener("change", () => gerarHorariosEdicao());
-document.getElementById("editProfissional").addEventListener("change", () => gerarHorariosEdicao());
-document.getElementById("editData").addEventListener("change", () => gerarHorariosEdicao());
+const editServico = document.getElementById("editServico");
+const editProfissional = document.getElementById("editProfissional");
+const editData = document.getElementById("editData");
+
+if (editServico) editServico.addEventListener("change", () => gerarHorariosEdicao());
+if (editProfissional) editProfissional.addEventListener("change", () => gerarHorariosEdicao());
+if (editData) editData.addEventListener("change", () => gerarHorariosEdicao());
 
 function carregarProfissionais() {
-    // Abstração sênior: Busca "colaboradores" para manter a plataforma agnóstica
+    if (!filtroProfissional) return;
     const profissionais = JSON.parse(localStorage.getItem("colaboradores")) || 
                           JSON.parse(localStorage.getItem("barbeiros")) || [];
 
@@ -51,24 +55,28 @@ function carregarCamposEdicao() {
     const profissionais = JSON.parse(localStorage.getItem("colaboradores")) || 
                           JSON.parse(localStorage.getItem("barbeiros")) || [];
 
-    const editServico = document.getElementById("editServico");
-    const editProfissional = document.getElementById("editProfissional");
+    const editServicoField = document.getElementById("editServico");
+    const editProfissionalField = document.getElementById("editProfissional");
 
-    editServico.innerHTML = '<option value="">Selecione um serviço</option>';
-    editProfissional.innerHTML = '<option value="">Selecione um profissional</option>';
+    if (editServicoField) editServicoField.innerHTML = '<option value="">Selecione um serviço</option>';
+    if (editProfissionalField) editProfissionalField.innerHTML = '<option value="">Selecione um profissional</option>';
 
     servicos.forEach(serv => {
-        editServico.innerHTML += `
-            <option value="${serv.nome}" data-tempo="${serv.duracao}" data-preco="${serv.preco}">
-                ${serv.nome} - ${serv.duracao} min - ${VELTRIX_UTILS.formatarMoeda(serv.preco)}
-            </option>
-        `;
+        if (editServicoField) {
+            editServicoField.innerHTML += `
+                <option value="${serv.nome}" data-tempo="${serv.duracao}" data-preco="${serv.preco}">
+                    ${serv.nome} - ${serv.duracao} min - ${VELTRIX_UTILS.formatarMoeda(serv.preco)}
+                </option>
+            `;
+        }
     });
 
     profissionais.forEach(prof => {
-        editProfissional.innerHTML += `
-            <option value="${prof.nome}">${prof.nome}</option>
-        `;
+        if (editProfissionalField) {
+            editProfissionalField.innerHTML += `
+                <option value="${prof.nome}">${prof.nome}</option>
+            `;
+        }
     });
 }
 
@@ -104,11 +112,11 @@ function filtroSemana() {
 
 function aplicarFiltros() {
     let resultado = [...listaFiltrada];
-    const profissional = filtroProfissional.value;
-    const status = filtroStatus.value;
+    const profissionalSelecionado = filtroProfissional ? filtroProfissional.value : "";
+    const status = filtroStatus ? filtroStatus.value : "todos";
 
-    if (profissional !== "") {
-        resultado = resultado.filter(item => item.barbeiro === profissional || item.profissional === profesional);
+    if (profissionalSelecionado !== "") {
+        resultado = resultado.filter(item => item.barbeiro === profissionalSelecionado || item.profissional === profissionalSelecionado);
     }
 
     if (status === "ativos") {
@@ -126,13 +134,19 @@ function atualizarResumoAgenda(lista) {
     const finalizados = lista.filter(item => item.status === "Finalizado");
     const cancelados = lista.filter(item => item.status === "Cancelado");
 
-    document.getElementById("agendaTotal").innerText = lista.length;
-    document.getElementById("agendaAtivos").innerText = ativos.length;
-    document.getElementById("agendaFinalizados").innerText = finalizados.length;
-    document.getElementById("agendaCancelados").innerText = cancelados.length;
+    const totalEl = document.getElementById("agendaTotal");
+    const ativosEl = document.getElementById("agendaAtivos");
+    const finalizadosEl = document.getElementById("agendaFinalizados");
+    const canceladosEl = document.getElementById("agendaCancelados");
+
+    if (totalEl) totalEl.innerText = lista.length;
+    if (ativosEl) ativosEl.innerText = ativos.length;
+    if (finalizadosEl) finalizadosEl.innerText = finalizados.length;
+    if (canceladosEl) canceladosEl.innerText = cancelados.length;
 }
 
 function renderizarAgenda(lista) {
+    if (!listaAgenda) return;
     listaAgenda.innerHTML = "";
 
     if (lista.length === 0) {
@@ -204,7 +218,8 @@ function abrirEdicaoAgendamento(event, posicao) {
     document.getElementById("editData").value = agendamento.data;
     document.getElementById("editObservacao").value = agendamento.observacao || "";
 
-    document.getElementById("boxEditarAgendamento").style.display = "flex";
+    const box = document.getElementById("boxEditarAgendamento");
+    if (box) box.style.display = "flex";
     gerarHorariosEdicao(agendamento.horario);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -251,27 +266,33 @@ function salvarEdicaoAgendamento() {
 
 function cancelarEdicaoAgendamento() {
     indiceEditando = null;
-    document.getElementById("boxEditarAgendamento").style.display = "none";
+    const box = document.getElementById("boxEditarAgendamento");
+    if (box) box.style.display = "none";
 }
 
 function gerarHorariosEdicao(horarioAtual = "") {
-    const profissional = document.getElementById("editProfissional").value;
-    const data = document.getElementById("editData").value;
-    const servico = document.getElementById("editServico").value;
+    const editProf = document.getElementById("editProfissional");
+    const editDt = document.getElementById("editData");
+    const editSrv = document.getElementById("editServico");
     const horarioSelect = document.getElementById("editHorario");
 
+    if (!horarioSelect) return;
     horarioSelect.innerHTML = '<option value="">Selecione um horário</option>';
 
-    if (!profissional || !data || !servico) return;
+    if (!editProf || !editDt || !editSrv) return;
+    const profesional = editProf.value;
+    const data = editDt.value;
+    const servico = editSrv.value;
 
-    const disponibilidade = obterDisponibilidadeDoDia(profissional, data);
+    if (!profesional || !data || !servico) return;
+
+    const disponibilidade = obterDisponibilidadeDoDia(profesional, data);
     if (!disponibilidade) {
         horarioSelect.innerHTML = '<option value="">Sem horários disponíveis</option>';
         return;
     }
 
-    const campoServico = document.getElementById("editServico");
-    const opcaoServico = campoServico.options[campoServico.selectedIndex];
+    const opcaoServico = editSrv.options[editSrv.selectedIndex];
     const tempo = Number(opcaoServico.getAttribute("data-tempo"));
 
     let inicio = converterHorarioParaMinutos(disponibilidade.entrada);
@@ -287,7 +308,7 @@ function gerarHorariosEdicao(horarioAtual = "") {
         const ocupado = agendamentos.some((item, index) => {
             if (index === indiceEditando) return false;
             const nomeProf = item.profissional || item.barbeiro;
-            if (nomeProf !== profissional || item.data !== data) return false;
+            if (nomeProf !== profesional || item.data !== data) return false;
 
             const inicioAgendamento = converterHorarioParaMinutos(item.horario);
             const fimAgendamento = inicioAgendamento + Number(item.tempo);
@@ -295,7 +316,7 @@ function gerarHorariosEdicao(horarioAtual = "") {
             return inicioNovo < fimAgendamento && fimNovo > inicioAgendamento;
         });
 
-        const bloqueado = estaBloqueado(profissional, data, inicioNovo, fimNovo);
+        const bloqueado = estaBloqueado(profesional, data, inicioNovo, fimNovo);
 
         if (!ocupado && !bloqueado && !dentroIntervalo) {
             horarioSelect.innerHTML += `<option value="${horarioFormatado}">${horarioFormatado}</option>`;
@@ -323,7 +344,7 @@ function obterDisponibilidadeDoDia(profissional, data) {
 
     return disponibilidades.find(item => {
         const nomeProf = item.profissional || item.barbeiro;
-        return nomeProf === profissional && item.dia === diaSemana;
+        return nomeProf === profesional && item.dia === diaSemana;
     });
 }
 
@@ -405,7 +426,6 @@ function enviarWhatsApp(event, posicao) {
     let telefone = agendamento.telefone.replace(/\D/g, "");
     if (!telefone.startsWith("55")) telefone = "55" + telefone;
 
-    // Busca dinâmica do nome da empresa em uso através do LocalStorage
     const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
     const dadosEmpresa = JSON.parse(localStorage.getItem("dadosEmpresa")) || {};
     
@@ -414,17 +434,15 @@ function enviarWhatsApp(event, posicao) {
                       dadosEmpresa.nome || 
                       dadosEmpresa.nomeFantasia;
 
-    // Se não houver nada configurado nas chaves acima, tenta ler o cabeçalho visível
     if (!nomeEmpresa) {
-        const elementoTitulo = document.querySelector("h1") || document.querySelector(".dashboard-card h2");
+        const elementoTitulo = document.querySelector("h1") || document.querySelector(".dashboard-header h1") || document.querySelector(".logo-text");
         if (elementoTitulo && elementoTitulo.innerText.trim() !== "") {
             nomeEmpresa = elementoTitulo.innerText.trim();
         } else {
-            nomeEmpresa = "Nossa Empresa";
+            nomeEmpresa = "Nosso Estabelecimento";
         }
     }
 
-    // Texto estruturado com quebras de linha limpas
     const mensagem = `Olá ${agendamento.nome}.\n\n` +
                      `Seu atendimento está confirmado! ✅\n\n` +
                      `📅 Data: ${VELTRIX_UTILS.formatarDataParaExibicao(agendamento.data)}\n` +
@@ -433,7 +451,6 @@ function enviarWhatsApp(event, posicao) {
                      `💈 Profissional: ${agendamento.profissional || agendamento.barbeiro}\n\n` +
                      `Obrigado por escolher a ${nomeEmpresa}.`;
 
-    // Proteção completa de codificação de caracteres
     const url = "https://api.whatsapp.com/send?phone=" + telefone + "&text=" + encodeURIComponent(mensagem);
     window.open(url, "_blank");
 }
