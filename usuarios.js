@@ -1,10 +1,10 @@
 /**
  * VELTRIX - Sistema de Agendamento Inteligente
- * Módulo: Gerenciamento de Usuários e Perfis de Acesso (usuarios.js)
+ * Módulo: Gerenciamento de Usuários Vinculados a Profissionais (usuarios.js)
  */
 
 /**
- * 1. FUNÇÃO DE ALTERNAR SENHA (ISOLADA NO TOPO)
+ * 1. FUNÇÃO DE ALTERNAR SENHA
  */
 function alternarVisibilidadeSenha() {
     const campoSenha = document.getElementById("senhaUsuario");
@@ -27,6 +27,7 @@ function alternarVisibilidadeSenha() {
 const listaUsuariosContainer = document.getElementById("listaUsuarios");
 const btnSalvarUsuario = document.getElementById("btnSalvarUsuario");
 
+// ATENÇÃO: Mudamos a referência do inputNome para capturar o elemento select ou input se necessário
 const inputNome = document.getElementById("nomeUsuario");
 const inputEmail = document.getElementById("emailUsuario");
 const inputSenha = document.getElementById("senhaUsuario");
@@ -36,6 +37,9 @@ const inputPerfil = document.getElementById("perfilUsuario");
  * 3. INICIALIZAÇÃO
  */
 document.addEventListener("DOMContentLoaded", () => {
+    // Transforma o input de Nome em um Select Dinâmico de Profissionais
+    popularSelectProfissionais();
+    
     renderizarListaUsuarios();
     
     if (btnSalvarUsuario) {
@@ -43,18 +47,53 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+/**
+ * Busca os profissionais cadastrados no localStorage e injeta no campo de Nome
+ */
+function popularSelectProfissionais() {
+    if (!inputNome) return;
+
+    // Tenta buscar da chave 'barbeiros' ou 'profissionais'
+    const profissionais = JSON.parse(localStorage.getItem("barbeiros")) || 
+                          JSON.parse(localStorage.getItem("profissionais")) || [];
+
+    // Se o elemento original for um INPUT de texto, vamos transformá-lo em SELECT ou alimentá-lo
+    // Para melhor usabilidade, limpamos e criamos as opções dinâmicas
+    let htmlOpcoes = `<option value="">Selecione um Profissional Cadastrado</option>`;
+    
+    profissionais.forEach(prof => {
+        // Usa o atributo correspondente ao nome no seu objeto de barbeiro (ex: prof.nome)
+        if (prof.nome) {
+            htmlOpcoes += `<option value="${prof.nome}">${prof.nome}</option>`;
+        }
+    });
+
+    // Adiciona uma opção caso queira cadastrar um usuário administrativo puro (ex: Proprietário)
+    htmlOpcoes += `<option value="Administrador Geral">-- Administrador Geral (Sem vínculo) --</option>`;
+
+    // Se o elemento no HTML já for um <select> ou transformado via JS:
+    if (inputNome.tagName !== "SELECT") {
+        // Substituição segura via outerHTML para transformá-lo em select mantendo o ID
+        inputNome.outerHTML = `<select id="nomeUsuario" class="form-input">${htmlOpcoes}</select>`;
+    } else {
+        inputNome.innerHTML = htmlOpcoes;
+    }
+}
+
 function obterUsuariosDoBanco() {
     return JSON.parse(localStorage.getItem("usuarios")) || [];
 }
 
 function processarCadastroUsuario() {
-    const nome = inputNome.value.trim();
+    // Recaptura o elemento atualizado caso ele tenha sido convertido em select
+    const selectNome = document.getElementById("nomeUsuario");
+    const nome = selectNome ? selectNome.value : "";
     const email = inputEmail.value.trim().toLowerCase();
     const senha = inputSenha.value.trim();
     const perfil = inputPerfil.value;
 
     if (!nome || !email || !senha || !perfil) {
-        alert("🚨 Erro: Todos os campos são obrigatórios.");
+        alert("🚨 Erro: Todos os campos são obrigatórios, incluindo a seleção do profissional.");
         return;
     }
 
@@ -72,7 +111,7 @@ function processarCadastroUsuario() {
         alert(`💾 Usuário [${email}] atualizado!`);
     } else {
         bancoUsuarios.push({ nome, email, senha, perfil });
-        alert(`✨ Novo usuário criado!`);
+        alert(`✨ Novo usuário criado para o profissional ${nome}!`);
     }
 
     localStorage.setItem("usuarios", JSON.stringify(bancoUsuarios));
@@ -123,7 +162,8 @@ function eliminarUsuario(emailUsuario) {
 }
 
 function limparFormularioUsuarios() {
-    if(inputNome) inputNome.value = "";
+    const selectNome = document.getElementById("nomeUsuario");
+    if(selectNome) selectNome.value = "";
     if(inputEmail) inputEmail.value = "";
     if(inputSenha) inputSenha.value = "";
     if(inputPerfil) inputPerfil.value = "";
