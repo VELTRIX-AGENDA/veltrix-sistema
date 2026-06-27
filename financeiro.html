@@ -1,10 +1,144 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Financeiro - VELTRIX</title>
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        html, body {
+            background-color: #050816 !important;
+            color: #ffffff !important;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+        }
+
+        .app-page {
+            background-color: #050816 !important;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 16px 16px 80px 16px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .hamburger-button {
+            background: none;
+            border: none;
+            color: #22D3EE;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Menu de Navegação Inferior Fixo */
+        .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+            z-index: 999;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .bottom-menu a {
+            color: #64748B;
+            text-decoration: none;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+        }
+
+        .bottom-menu a.menu-plus {
+            background: linear-gradient(135deg, #2563EB, #22D3EE);
+            color: #ffffff;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+        }
+
+        /* Sidebar Menu Lateral */
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: #0F172A;
+            z-index: 2000;
+            transition: left 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-menu.ativo {
+            left: 0;
+        }
+
+        .sidebar-menu h2 {
+            font-size: 20px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #2563EB, #22D3EE);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-menu a {
+            color: #94A3B8;
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #22D3EE;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.6);
+            z-index: 1999;
+            display: none;
+        }
+
+        .sidebar-overlay.ativo {
+            display: block;
+        }
+    </style>
 </head>
 
 <body class="app-page">
@@ -12,276 +146,200 @@
     <main class="app-container">
 
         <header class="app-header">
-
-            <a class="back-button" href="#" onclick="history.back()">←</a>
+            <button class="hamburger-button" onclick="abrirMenu()">☰</button>
 
             <div>
                 <h1>Financeiro</h1>
                 <p>Resultados, lucro e desempenho</p>
             </div>
-
         </header>
 
         <section class="hero-card">
-
             <h2>Central Financeira</h2>
-
-            <p>
-                Controle faturamento, despesas,
-                lucro, rankings e metas.
-            </p>
-
+            <p>Controle faturamento, despesas, lucro, rankings e metas.</p>
         </section>
 
         <div class="financeiro-filtros-rapidos">
-
-            <button onclick="filtroHoje()">
-                Hoje
-            </button>
-
-            <button onclick="filtroOntem()">
-                Ontem
-            </button>
-
-            <button onclick="filtroSemana()">
-                Semana
-            </button>
-
-            <button onclick="filtroMes()">
-                Mês
-            </button>
-
+            <button onclick="filtroHoje()">Hoje</button>
+            <button onclick="filtroOntem()">Ontem</button>
+            <button onclick="filtroSemana()">Semana</button>
+            <button onclick="filtroMes()">Mês</button>
         </div>
 
         <section class="mobile-form">
-
             <div class="form-section">
-
                 <h3>Filtro Personalizado</h3>
 
                 <label>Data Inicial</label>
-                <input
-                    type="date"
-                    id="dataInicialFinanceiro"
-                >
+                <input type="date" id="dataInicialFinanceiro">
 
                 <label>Data Final</label>
-                <input
-                    type="date"
-                    id="dataFinalFinanceiro"
-                >
+                <input type="date" id="dataFinalFinanceiro">
 
-                <button
-                    id="btnFiltrarFinanceiro"
-                    class="primary-action"
-                >
+                <button id="btnFiltrarFinanceiro" class="primary-action">
                     Filtrar Período
                 </button>
-
             </div>
-
         </section>
 
         <section class="dashboard-stats">
-
             <div class="stat-card destaque">
                 <span>Faturamento</span>
-                <strong id="faturamentoPeriodo">
-                    R$ 0,00
-                </strong>
+                <strong id="faturamentoPeriodo">R$ 0,00</strong>
                 <small>No período selecionado</small>
             </div>
 
             <div class="stat-card">
                 <span>Despesas</span>
-                <strong id="despesasPeriodo">
-                    R$ 0,00
-                </strong>
+                <strong id="despesasPeriodo">R$ 0,00</strong>
                 <small>Saídas cadastradas</small>
             </div>
 
             <div class="stat-card">
                 <span>Lucro</span>
-                <strong id="lucroPeriodo">
-                    R$ 0,00
-                </strong>
+                <strong id="lucroPeriodo">R$ 0,00</strong>
                 <small>Resultado líquido</small>
             </div>
 
             <div class="stat-card">
                 <span>Margem</span>
-                <strong id="margemLucro">
-                    0%
-                </strong>
+                <strong id="margemLucro">0%</strong>
                 <small>Rentabilidade</small>
             </div>
 
             <div class="stat-card">
                 <span>Finalizados</span>
-                <strong id="totalFinalizados">
-                    0
-                </strong>
+                <strong id="totalFinalizados">0</strong>
                 <small>Atendimentos</small>
             </div>
 
             <div class="stat-card">
                 <span>Cancelados</span>
-                <strong id="totalCancelados">
-                    0
-                </strong>
+                <strong id="totalCancelados">0</strong>
                 <small>No período</small>
             </div>
 
             <div class="stat-card">
                 <span>Ticket Médio</span>
-                <strong id="ticketMedio">
-                    R$ 0,00
-                </strong>
+                <strong id="ticketMedio">R$ 0,00</strong>
                 <small>Por atendimento</small>
             </div>
 
             <div class="stat-card">
                 <span>Clientes</span>
-                <strong id="clientesAtivos">
-                    0
-                </strong>
+                <strong id="clientesAtivos">0</strong>
                 <small>Atendidos</small>
             </div>
 
             <div class="stat-card destaque">
                 <span>Melhor Dia</span>
-                <strong id="melhorDia">
-                    -
-                </strong>
+                <strong id="melhorDia">-</strong>
                 <small>Maior faturamento</small>
             </div>
-
         </section>
 
         <section class="mobile-form">
-
             <div class="form-section">
-
                 <h3>Registrar Despesa</h3>
 
                 <label>Descrição</label>
-
-                <input
-                    type="text"
-                    id="descricaoDespesa"
-                    placeholder="Ex: Aluguel, energia, produtos..."
-                >
+                <input type="text" id="descricaoDespesa" placeholder="Ex: Aluguel, energia, produtos...">
 
                 <label>Valor</label>
-
-                <input
-                    type="number"
-                    id="valorDespesa"
-                    placeholder="Ex: 150"
-                >
+                <input type="number" id="valorDespesa" placeholder="Ex: 150">
 
                 <label>Data</label>
+                <input type="date" id="dataDespesa">
 
-                <input
-                    type="date"
-                    id="dataDespesa"
-                >
-
-                <button
-                    id="btnSalvarDespesa"
-                    class="primary-action"
-                >
+                <button id="btnSalvarDespesa" class="primary-action">
                     Salvar Despesa
                 </button>
-
             </div>
-
         </section>
 
         <section class="top-servicos-card">
-
             <h3>Despesas do Período</h3>
-
             <div id="listaDespesas"></div>
-
         </section>
 
         <section class="top-servicos-card">
-
             <h3>Ranking da Equipe</h3>
-
             <div id="topProfissionais"></div>
-
         </section>
 
         <section class="top-servicos-card">
-
             <h3>Serviços Mais Vendidos</h3>
-
             <div id="topServicos"></div>
-
         </section>
 
         <section class="top-servicos-card">
-
             <h3>Clientes Destaque</h3>
-
             <div id="topClientes"></div>
-
         </section>
 
         <section class="top-servicos-card">
-
             <h3>Meta Financeira</h3>
-
             <label>Meta de Faturamento</label>
+            <input type="number" id="metaFinanceira" placeholder="Ex: 10000">
 
-            <input
-                type="number"
-                id="metaFinanceira"
-                placeholder="Ex: 10000"
-            >
-
-            <button
-                id="btnSalvarMeta"
-                class="primary-action"
-            >
+            <button id="btnSalvarMeta" class="primary-action">
                 Salvar Meta
             </button>
-
             <div id="resultadoMeta"></div>
-
         </section>
 
     </main>
 
     <nav class="bottom-menu">
-
         <a href="dashboard.html">🏠</a>
-
         <a href="agenda.html">📅</a>
-
-        <a
-            href="agendamentos.html"
-            class="menu-plus"
-        >
-            +
-        </a>
-
+        <a href="agendamentos.html" class="menu-plus">+</a>
         <a href="equipe.html">👥</a>
-
         <a href="gestao.html">📊</a>
-
     </nav>
 
-    <!-- SEGURANÇA -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
+
+    <aside id="sidebarMenu" class="sidebar-menu">
+        <h2 id="nomeEmpresaSidebar">VELTRIX</h2>
+
+        <a href="dashboard.html">Início</a>
+        <a href="agenda.html">Agenda Geral</a>
+        <a href="agendamentos.html">Novo Agendamento</a>
+
+        <a href="barbeiros.html">Profissionais</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="financeiro.html">Financeiro</a>
+        <a href="relatorios.html">Relatórios</a>
+        <a href="usuarios.html">Usuários</a>
+
+        <a href="#" onclick="fazerLogout()">Sair</a>
+    </aside>
 
     <script src="auth.js"></script>
-
-    <!-- FINANCEIRO -->
-
     <script src="financeiro.js"></script>
 
-</body>
+    <script>
+        const usuarioAtual = JSON.parse(localStorage.getItem("usuarioLogado"));
 
+        // Proteção ativa da tela
+        if (!usuarioAtual) {
+            window.location.href = "index.html";
+        } else if (usuarioAtual.empresa) {
+            document.getElementById("nomeEmpresaSidebar").innerText = usuarioAtual.empresa.toUpperCase();
+        }
+
+        function abrirMenu() {
+            document.getElementById("sidebarMenu").classList.add("ativo");
+            document.getElementById("sidebarOverlay").classList.add("ativo");
+        }
+
+        function fecharMenu() {
+            document.getElementById("sidebarMenu").classList.remove("ativo");
+            document.getElementById("sidebarOverlay").classList.remove("ativo");
+        }
+    </script>
+
+</body>
 </html>
