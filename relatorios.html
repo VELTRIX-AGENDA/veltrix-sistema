@@ -1,9 +1,144 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Relatórios - VELTRIX</title>
     <link rel="stylesheet" href="style.css">
+    
+    <style>
+        html, body {
+            background-color: #050816 !important;
+            color: #ffffff !important;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+        }
+
+        .app-page {
+            background-color: #050816 !important;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 16px 16px 80px 16px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .hamburger-button {
+            background: none;
+            border: none;
+            color: #22D3EE;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Menu de Navegação Inferior Fixo */
+        .bottom-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 60px;
+            z-index: 999;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .bottom-menu a {
+            color: #64748B;
+            text-decoration: none;
+            font-size: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+        }
+
+        .bottom-menu a.menu-plus {
+            background: linear-gradient(135deg, #2563EB, #22D3EE);
+            color: #ffffff;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3);
+        }
+
+        /* Sidebar Menu Lateral */
+        .sidebar-menu {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            background: #0F172A;
+            z-index: 2000;
+            transition: left 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .sidebar-menu.ativo {
+            left: 0;
+        }
+
+        .sidebar-menu h2 {
+            font-size: 20px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, #2563EB, #22D3EE);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-menu a {
+            color: #94A3B8;
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sidebar-menu a:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #22D3EE;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0,0,0,0.6);
+            z-index: 1999;
+            display: none;
+        }
+
+        .sidebar-overlay.ativo {
+            display: block;
+        }
+    </style>
 </head>
 
 <body class="app-page">
@@ -11,7 +146,7 @@
     <main class="app-container">
 
         <header class="app-header">
-            <a class="back-button" href="#" onclick="history.back()">←</a>
+            <button class="hamburger-button" onclick="abrirMenu()">☰</button>
 
             <div>
                 <h1>Relatórios</h1>
@@ -115,7 +250,48 @@
         <a href="gestao.html">📊</a>
     </nav>
 
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenu()"></div>
+
+    <aside id="sidebarMenu" class="sidebar-menu">
+        <h2 id="nomeEmpresaSidebar">VELTRIX</h2>
+
+        <a href="dashboard.html">Início</a>
+        <a href="agenda.html">Agenda Geral</a>
+        <a href="agendamentos.html">Novo Agendamento</a>
+
+        <a href="barbeiros.html">Profissionais</a>
+        <a href="servicos.html">Serviços</a>
+        <a href="clientes.html">Clientes</a>
+        <a href="financeiro.html">Financeiro</a>
+        <a href="relatorios.html">Relatórios</a>
+        <a href="usuarios.html">Usuários</a>
+
+        <a href="#" onclick="fazerLogout()">Sair</a>
+    </aside>
+
+    <script src="auth.js"></script>
     <script src="relatorios.js"></script>
+
+    <script>
+        const usuarioAtual = JSON.parse(localStorage.getItem("usuarioLogado"));
+
+        // Proteção ativa de rota
+        if (!usuarioAtual) {
+            window.location.href = "index.html";
+        } else if (usuarioAtual.empresa) {
+            document.getElementById("nomeEmpresaSidebar").innerText = usuarioAtual.empresa.toUpperCase();
+        }
+
+        function abrirMenu() {
+            document.getElementById("sidebarMenu").classList.add("ativo");
+            document.getElementById("sidebarOverlay").classList.add("ativo");
+        }
+
+        function fecharMenu() {
+            document.getElementById("sidebarMenu").classList.remove("ativo");
+            document.getElementById("sidebarOverlay").classList.remove("ativo");
+        }
+    </script>
 
 </body>
 </html>
