@@ -171,6 +171,9 @@ botaoSalvar.addEventListener("click", function () {
     });
 });
 
+/**
+ * 🎨 CARREGAMENTO DINÂMICO DOS PROFISSIONAIS (FIRESTORE)
+ */
 function carregarBarbeirosNuvem() {
     const lista = document.getElementById("listaProfissionaisAgendamento");
     const campoBarbeiro = document.getElementById("barbeiro");
@@ -180,7 +183,7 @@ function carregarBarbeirosNuvem() {
             if (lista) lista.innerHTML = "";
             if (campoBarbeiro) campoBarbeiro.innerHTML = '<option value="">Selecione o profissional</option>';
 
-            snapshot.forEach((doc, idx) => {
+            snapshot.forEach((doc) => {
                 const prof = doc.data();
                 if (campoBarbeiro) {
                     campoBarbeiro.innerHTML += `<option value="${prof.nome}">${prof.nome}</option>`;
@@ -188,8 +191,10 @@ function carregarBarbeirosNuvem() {
                 if (lista) {
                     const inicial = prof.nome.charAt(0).toUpperCase();
                     const fotoHtml = prof.foto ? `<img src="${prof.foto}" class="profissional-card-foto">` : `<div class="profissional-card-avatar">${inicial}</div>`;
+                    
+                    // PASSAGEM DO 'this': Captura o próprio elemento DOM para ativação do CSS de feedback visual
                     lista.innerHTML += `
-                        <div class="profissional-quadrado profesional-opcao" onclick="selecionarProfissional('${prof.nome}')" id="profissional-${idx}">
+                        <div class="profissional-quadrado profesional-opcao" onclick="selecionarProfissional('${prof.nome}', this)">
                             ${fotoHtml}
                             <strong>${prof.nome}</strong>
                         </div>
@@ -199,12 +204,24 @@ function carregarBarbeirosNuvem() {
         });
 }
 
-function selecionarProfissional(nome) {
+/**
+ * 🎯 SELEÇÃO DE PROFISSIONAL COM FEEDBACK VISUAL CORRIGIDO
+ */
+function selecionarProfissional(nome, elementoClicado) {
     const inputBarbeiro = document.getElementById("barbeiro");
     if (!inputBarbeiro) return;
     
     inputBarbeiro.value = nome;
-    document.querySelectorAll(".profissional-opcao").forEach(card => card.classList.remove("selecionado"));
+    
+    // Remove a classe visual 'selecionado' de todos os cards da listagem
+    document.querySelectorAll(".profesional-opcao").forEach(card => {
+        card.classList.remove("selecionado");
+    });
+    
+    // Aplica a classe de destaque diretamente no card que recebeu o clique do usuário
+    if (elementoClicado) {
+        elementoClicado.classList.add("selecionado");
+    }
     
     // Dispara a atualização visual dos horários
     gerarHorariosDisponiveis();
@@ -295,7 +312,7 @@ function converterHorarioParaMinutos(horario) {
 
 function converterMinutosParaHorario(minutosTotais) {
     const horas = Math.floor(minutosTotais / 60);
-    const minutos = minutosTotais % 60;
+    const minutos = minutesTotais = minutosTotais % 60;
     return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
 }
 
