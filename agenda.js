@@ -1,114 +1,113 @@
 /**
  * VELTRIX - Sistema de Agendamento Inteligente
- * Módulo: Painel Operacional da Agenda Geral (agenda.js)
+ * Módulo: Painel Operacional da Agenda Geral na Nuvem (agenda.js)
  */
 
-let agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
+// Captura a sessão do estabelecimento logado para isolamento Multi-Tenant
+const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+const tenantID = usuarioLogado.empresa || "Geral";
 
-// Sanitização profissional da base de dados local
-agendamentos = agendamentos.filter(item => {
-    if (!item.data) return false;
-    const ano = Number(item.data.split("-")[0]);
-    return ano >= 2024 && ano <= 2100;
-});
-localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
+let agendamentos = [];
+let listaFiltrada = [];
+let indiceEditando = null; // Agora armazenará o ID do documento Firestore
 
 // Seletores do DOM
 const listaAgenda = document.getElementById("listaAgenda");
 const filtroProfissional = document.getElementById("filtroProfissional");
 const filtroStatus = document.getElementById("filtroStatus");
 
-let listaFiltrada = [...agendamentos];
-let indiceEditando = null;
-
-// Inicialização Core
-carregarProfissionais();
-carregarCamposEdicao();
-filtroTodos(); // Configurado para trazer a listagem macro e contagem geral na abertura
-
-// Event Listeners
-if (filtroProfissional) filtroProfissional.addEventListener("change", aplicarFiltros);
-if (filtroStatus) filtroStatus.addEventListener("change", aplicarFiltros);
-
 const editServico = document.getElementById("editServico");
 const editProfissional = document.getElementById("editProfissional");
 const editData = document.getElementById("editData");
+
+// Inicialização Core Conectada
+carregarProfissionaisNuvem();
+carregarCamposEdicaoNuvem();
+configurarLimitadorCalendario();
+escutarAgendamentosNuvem();
+
+// Event Listeners de Filtro
+if (filtroProfissional) filtroProfissional.addEventListener("change", aplicarFiltros);
+if (filtroStatus) filtroStatus.addEventListener("change", aplicarFiltros);
 
 if (editServico) editServico.addEventListener("change", () => gerarHorariosEdicao());
 if (editProfissional) editProfissional.addEventListener("change", () => gerarHorariosEdicao());
 if (editData) editData.addEventListener("change", () => gerarHorariosEdicao());
 
-function carregarProfissionais() {
-    if (!filtroProfissional) return;
-    const profissionais = JSON.parse(localStorage.getItem("colaboradores")) || 
-                          JSON.parse(localStorage.getItem("barbeiros")) || [];
-
-    profissionais.forEach(prof => {
-        filtroProfissional.innerHTML += `
-            <option value="${prof.nome}">${prof.nome}</option>
-        `;
-    });
+/**
+ * 🔒 TRAVA DE CALENDÁRIO: Bloqueia a seleção de qualquer data anterior a hoje
+ */
+function configurarLimitadorCalendario() {
+    if (editData) {
+        const hoje = VELTRIX_UTILS.formatarDataParaInput(new Date());
+        editData.min = hoje; // Escurece e impossibilita cliques retroativos no navegador
+    }
 }
 
-function carregarCamposEdicao() {
-    const servicos = JSON.parse(localStorage.getItem("servicos")) || [];
-    const profissionais = JSON.parse(localStorage.getItem("colaboradores")) || 
-                          JSON.parse(localStorage.getItem("barbeiros")) || [];
+/**
+ * ⏳ ESCUTA EM TEMPO REAL: Sincroniza a listagem com o Cloud Firestore
+ */
+function escutarAgendamentosNuvem() {
+    db.collection("veltrix_agendamentos")
+        .where("tenantID", "==", tenantID)
+        .onSnapshot(snapshot => {
+            agendamentos = [];
+            snapshot.forEach(doc => {
+                agendamentos.push({ id: doc.id, ...doc.data() });
+            });
+            filtroTodos();
+        }, erro => console.error("Erro ao sincronizar agenda:", erro));
+}
 
+function carregarProfissionaisNuvem() {
+    if (!filtroProfissional) return;
+    db.collection("veltrix_barbeiros").where("tenantID", "==", tenantID).get()
+        .then(snapshot => {
+            filtroProfissional.innerHTML = '<option value="">Todos os profissionais</option>';
+            snapshot.forEach(doc => {
+                const prof = doc.data();
+                filtroProfissional.innerHTML += `<option value="${prof.nome}">${prof.nome}</option>`;
+            });
+        });
+}
+
+function carregarCamposEdicaoNuvem() {
     const editServicoField = document.getElementById("editServico");
     const editProfissionalField = document.getElementById("editProfissional");
 
     if (editServicoField) editServicoField.innerHTML = '<option value="">Selecione um serviço</option>';
     if (editProfissionalField) editProfissionalField.innerHTML = '<option value="">Selecione um profissional</option>';
 
-    servicos.forEach(serv => {
-        if (editServicoField) {
-            editServicoField.innerHTML += `
-                <option value="${serv.nome}" data-tempo="${serv.duracao}" data-preco="${serv.preco}">
-                    ${serv.nome} - ${serv.duracao} min - ${VELTRIX_UTILS.formatarMoeda(serv.preco)}
-                </option>
-            `;
-        }
-    });
+    db.collection("veltrix_servicos").where("tenantID", "==", tenantID).get()
+        .then(snapshot => {
+            snapshot.forEach(doc => {
+                const serv = doc.data();
+                if (editServicoField) {
+                    editServicoField.innerHTML += `
+                        <option value="${serv.nome}" data-tempo="${serv.duracao}" data-preco="${serv.preco}">
+                            ${serv.nome} - ${serv.duracao} min - ${VELTRIX_UTILS.formatarMoeda(serv.preco)}
+                        </option>
+                    `;
+                }
+            });
+        });
 
-    profissionais.forEach(prof => {
-        if (editProfissionalField) {
-            editProfissionalField.innerHTML += `
-                <option value="${prof.nome}">${prof.nome}</option>
-            `;
-        }
-    });
+    db.collection("veltrix_barbeiros").where("tenantID", "==", tenantID).get()
+        .then(snapshot => {
+            snapshot.forEach(doc => {
+                const prof = doc.data();
+                if (editProfissionalField) {
+                    editProfissionalField.innerHTML += `<option value="${prof.nome}">${prof.nome}</option>`;
+                }
+            });
+        });
 }
 
-function filtroTodos() {
-    listaFiltrada = [...agendamentos];
-    aplicarFiltros();
-}
-
-function filtroHoje() {
-    const hoje = VELTRIX_UTILS.formatarDataParaInput(new Date());
-    listaFiltrada = agendamentos.filter(item => item.data === hoje);
-    aplicarFiltros();
-}
-
-function filtroAmanha() {
-    const amanha = new Date();
-    amanha.setDate(amanha.getDate() + 1);
-    const dataStr = VELTRIX_UTILS.formatarDataParaInput(amanha);
-
-    listaFiltrada = agendamentos.filter(item => item.data === dataStr);
-    aplicarFiltros();
-}
-
-function filtroSemana() {
-    const hojeStr = VELTRIX_UTILS.formatarDataParaInput(new Date());
-    const finalSemana = new Date();
-    finalSemana.setDate(finalSemana.getDate() + 7);
-    const fimStr = VELTRIX_UTILS.formatarDataParaInput(finalSemana);
-
-    listaFiltrada = agendamentos.filter(item => item.data >= hojeStr && item.data <= fimStr);
-    aplicarFiltros();
-}
+// Funções de Filtros de Visualização
+function filtroTodos() { listaFiltrada = [...agendamentos]; aplicarFiltros(); }
+function filtroHoje() { const hoje = VELTRIX_UTILS.formatarDataParaInput(new Date()); listaFiltrada = agendamentos.filter(i => i.data === hoje); aplicarFiltros(); }
+function filtroAmanha() { const am = new Date(); am.setDate(am.getDate() + 1); const dataStr = VELTRIX_UTILS.formatarDataParaInput(am); listaFiltrada = agendamentos.filter(i => i.data === dataStr); aplicarFiltros(); }
+function filtroSemana() { const hjStr = VELTRIX_UTILS.formatarDataParaInput(new Date()); const fs = new Date(); fs.setDate(fs.getDate() + 7); const fimStr = VELTRIX_UTILS.formatarDataParaInput(fs); listaFiltrada = agendamentos.filter(i => i.data >= hjStr && i.data <= fimStr); aplicarFiltros(); }
 
 function aplicarFiltros() {
     let resultado = [...listaFiltrada];
@@ -172,13 +171,13 @@ function renderizarAgenda(lista) {
         grupos[data].sort((a, b) => a.horario.localeCompare(b.horario));
 
         grupos[data].forEach(agendamento => {
-            const indiceOriginal = agendamentos.indexOf(agendamento);
+            const docID = agendamento.id;
             const status = agendamento.status || "Agendado";
             const podeAlterar = status === "Agendado" || status === "Em Atendimento";
             const nomePrestador = agendamento.profissional || agendamento.barbeiro;
 
             listaAgenda.innerHTML += `
-                <div class="agenda-card" onclick="${podeAlterar ? `alternarAcoesAgenda(${indiceOriginal})` : ""}">
+                <div class="agenda-card" onclick="${podeAlterar ? `alternarAcoesAgenda('${docID}')` : ""}">
                     <div class="agenda-card-topo">
                         <div>
                             <strong>${agendamento.horario}</strong>
@@ -192,12 +191,12 @@ function renderizarAgenda(lista) {
                         <span>Telefone: ${agendamento.telefone || "Não informado"}</span>
                     </div>
                     ${podeAlterar ? `
-                        <div class="acoes-atendimento" id="acoes-agenda-${indiceOriginal}">
-                            <button onclick="alterarStatusAgenda(event, ${indiceOriginal}, 'Em Atendimento')">Iniciar Atendimento</button>
-                            <button onclick="alterarStatusAgenda(event, ${indiceOriginal}, 'Finalizado')">Finalizar</button>
-                            <button onclick="alterarStatusAgenda(event, ${indiceOriginal}, 'Cancelado')">Cancelar</button>
-                            <button onclick="abrirEdicaoAgendamento(event, ${indiceOriginal})">Editar</button>
-                            <button onclick="enviarWhatsApp(event, ${indiceOriginal})">WhatsApp</button>
+                        <div class="acoes-atendimento" id="acoes-agenda-${docID}">
+                            <button onclick="alterarStatusAgenda(event, '${docID}', 'Em Atendimento')">Iniciar Atendimento</button>
+                            <button onclick="alterarStatusAgenda(event, '${docID}', 'Finalizado')">Finalizar</button>
+                            <button onclick="alterarStatusAgenda(event, '${docID}', 'Cancelado')">Cancelar</button>
+                            <button onclick="abrirEdicaoAgendamento(event, '${docID}')">Editar</button>
+                            <button onclick="enviarWhatsApp(event, '${docID}')">WhatsApp</button>
                         </div>
                     ` : `<div class="status-fechado">Atendimento encerrado</div>`}
                 </div>
@@ -206,10 +205,12 @@ function renderizarAgenda(lista) {
     });
 }
 
-function abrirEdicaoAgendamento(event, posicao) {
+function abrirEdicaoAgendamento(event, docID) {
     event.stopPropagation();
-    const agendamento = agendamentos[posicao];
-    indiceEditando = posicao;
+    const agendamento = agendamentos.find(i => i.id === docID);
+    if (!agendamento) return;
+    
+    indiceEditando = docID;
 
     document.getElementById("editNome").value = agendamento.nome;
     document.getElementById("editTelefone").value = agendamento.telefone;
@@ -220,8 +221,8 @@ function abrirEdicaoAgendamento(event, posicao) {
 
     const box = document.getElementById("boxEditarAgendamento");
     if (box) box.style.display = "flex";
+    
     gerarHorariosEdicao(agendamento.horario);
-
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
@@ -246,22 +247,23 @@ function salvarEdicaoAgendamento() {
         return;
     }
 
-    agendamentos[indiceEditando].nome = nome;
-    agendamentos[indiceEditando].telefone = telefone;
-    agendamentos[indiceEditando].servico = servico;
-    agendamentos[indiceEditando].barbeiro = profissional;
-    agendamentos[indiceEditando].profissional = profissional;
-    agendamentos[indiceEditando].data = data;
-    agendamentos[indiceEditando].horario = horario;
-    agendamentos[indiceEditando].observacao = observacao;
-    agendamentos[indiceEditando].tempo = tempo;
-    agendamentos[indiceEditando].preco = preco;
-
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-
-    cancelarEdicaoAgendamento();
-    atualizarBaseFiltroAtual();
-    aplicarFiltros();
+    // SALVANDO NA NUVEM: Dá um update direto no documento específico
+    db.collection("veltrix_agendamentos").doc(indiceEditando).update({
+        nome: nome,
+        telefone: telefone,
+        servico: servico,
+        barbeiro: profesional,
+        profissional: profissional,
+        data: data,
+        horario: horario,
+        observacao: observacao,
+        tempo: tempo,
+        preco: preco
+    })
+    .then(() => {
+        cancelarEdicaoAgendamento();
+    })
+    .catch(erro => alert("Erro ao atualizar agendamento na nuvem: " + erro.message));
 }
 
 function cancelarEdicaoAgendamento() {
@@ -270,6 +272,9 @@ function cancelarEdicaoAgendamento() {
     if (box) box.style.display = "none";
 }
 
+/**
+ * 🔒 GERADOR DE GRADE INTELIGENTE ANTI-RETROATIVA
+ */
 function gerarHorariosEdicao(horarioAtual = "") {
     const editProf = document.getElementById("editProfissional");
     const editDt = document.getElementById("editData");
@@ -285,6 +290,11 @@ function gerarHorariosEdicao(horarioAtual = "") {
     const servico = editSrv.value;
 
     if (!profesional || !data || !servico) return;
+
+    // Lógica para detecção do dia de hoje e hora do agora
+    const agora = new Date();
+    const dataHojeStr = VELTRIX_UTILS.formatarDataParaInput(agora);
+    const horaAtualMinutos = (agora.getHours() * 60) + agora.getMinutes();
 
     const disponibilidade = obterDisponibilidadeDoDia(profesional, data);
     if (!disponibilidade) {
@@ -303,10 +313,16 @@ function gerarHorariosEdicao(horarioAtual = "") {
         const inicioNovo = inicio;
         const fimNovo = inicioNovo + tempo;
 
+        // VALIDAÇÃO CRUCIAL: Se for hoje, some com horários que já passaram
+        if (data === dataHojeStr && inicioNovo < horaAtualMinutos) {
+            inicio += 30;
+            continue; // Ignora e passa para o próximo slot de tempo
+        }
+
         const dentroIntervalo = conflitaComIntervalo(inicioNovo, fimNovo, disponibilidade);
 
-        const ocupado = agendamentos.some((item, index) => {
-            if (index === indiceEditando) return false;
+        const ocupado = agendamentos.some(item => {
+            if (item.id === indiceEditando) return false;
             const nomeProf = item.profissional || item.barbeiro;
             if (nomeProf !== profesional || item.data !== data) return false;
 
@@ -334,17 +350,13 @@ function gerarHorariosEdicao(horarioAtual = "") {
     }
 }
 
-function atualizarBaseFiltroAtual() {
-    listaFiltrada = [...agendamentos];
-}
-
 function obterDisponibilidadeDoDia(profissional, data) {
     const diaSemana = obterDiaSemana(data);
     const disponibilidades = JSON.parse(localStorage.getItem("disponibilidades")) || [];
 
     return disponibilidades.find(item => {
         const nomeProf = item.profissional || item.barbeiro;
-        return nomeProf === profissional && item.dia === diaSemana;
+        return nomeProf === profesional && item.dia === diaSemana;
     });
 }
 
@@ -371,16 +383,17 @@ function conflitaComIntervalo(inicioNovo, fimNovo, disponibilidade) {
     return inicioNovo < fimIntervalo && fimNovo > inicioIntervalo;
 }
 
-function alternarAcoesAgenda(posicao) {
-    const caixa = document.getElementById("acoes-agenda-" + posicao);
+function alternarAcoesAgenda(docID) {
+    const caixa = document.getElementById("acoes-agenda-" + docID);
     if (caixa) caixa.classList.toggle("mostrar");
 }
 
-function alterarStatusAgenda(event, posicao, novoStatus) {
+function alterarStatusAgenda(event, docID, nuevoStatus) {
     event.stopPropagation();
-    agendamentos[posicao].status = novoStatus;
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-    aplicarFiltros();
+    db.collection("veltrix_agendamentos").doc(docID).update({
+        status: nuevoStatus
+    })
+    .catch(erro => console.error("Erro ao alterar status:", erro));
 }
 
 function classeStatus(status) {
@@ -414,9 +427,10 @@ function converterMinutosParaHorario(minutosTotais) {
     return String(horas).padStart(2, "0") + ":" + String(minutos).padStart(2, "0");
 }
 
-function enviarWhatsApp(event, posicao) {
+function enviarWhatsApp(event, docID) {
     event.stopPropagation();
-    const agendamento = agendamentos[posicao];
+    const agendamento = agendamentos.find(i => i.id === docID);
+    if (!agendamento) return;
 
     if (!agendamento.telefone) {
         alert("Cliente sem telefone cadastrado.");
@@ -426,22 +440,8 @@ function enviarWhatsApp(event, posicao) {
     let telefone = agendamento.telefone.replace(/\D/g, "");
     if (!telefone.startsWith("55")) telefone = "55" + telefone;
 
-    const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
     const dadosEmpresa = JSON.parse(localStorage.getItem("dadosEmpresa")) || {};
-    
-    let nomeEmpresa = usuarioLogado.nomeEmpresa || 
-                      usuarioLogado.empresa || 
-                      dadosEmpresa.nome || 
-                      dadosEmpresa.nomeFantasia;
-
-    if (!nomeEmpresa) {
-        const elementoTitulo = document.querySelector("h1") || document.querySelector(".dashboard-header h1") || document.querySelector(".logo-text");
-        if (elementoTitulo && elementoTitulo.innerText.trim() !== "") {
-            nomeEmpresa = elementoTitulo.innerText.trim();
-        } else {
-            nomeEmpresa = "Nosso Estabelecimento";
-        }
-    }
+    let nomeEmpresa = tenantID !== "Geral" ? tenantID : (dadosEmpresa.nome || "Nosso Estabelecimento");
 
     const mensagem = `Olá ${agendamento.nome}.\n\n` +
                      `Seu atendimento está confirmado! ✅\n\n` +
