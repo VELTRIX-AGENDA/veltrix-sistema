@@ -1,12 +1,10 @@
 /**
  * VELTRIX - Sistema de Autenticação e Segurança Inteligente Multi-Tenant
- * Módulo: Fluxo Separado, Validação Antisequencial de Senha, Medidor de Força e Dados do Estabelecimento
+ * Módulo: Conexão em Nuvem Firestore, Validação Antisequencial de Senha e Medidor de Força
  */
 
-// --- VERIFICAÇÃO DE SESSÃO PERMANENTE (LOCALSTORAGE) ---
-// Se o usuário já estiver logado e tentar acessar a página de login/cadastro, manda direto para a dashboard
+// --- VERIFICAÇÃO DE SESSÃO PERMANENTE ---
 if (localStorage.getItem("usuarioLogado")) {
-    // Evita loop de redirecionamento se já estiver na dashboard ou páginas internas
     if (window.location.pathname.includes("index.html") || window.location.pathname.endsWith("/") || window.location.pathname.includes("login")) {
         window.location.href = "dashboard.html";
     }
@@ -14,7 +12,7 @@ if (localStorage.getItem("usuarioLogado")) {
 
 // 1. INICIALIZAÇÃO DO EMAILJS
 emailjs.init({
-    publicKey: "JM2E6ko8vRLfYh1Ty", // Sua chave pública ativa
+    publicKey: "JM2E6ko8vRLfYh1Ty", 
 });
 
 // Captura de Elementos do DOM
@@ -30,7 +28,6 @@ const inputEmail = document.getElementById("regEmail");
 const inputSenha = document.getElementById("regSenha");
 const inputCodigo = document.getElementById("codigoInput");
 
-// ELEMENTOS ADICIONADOS PARA CAPTURA MULTI-TENANT
 const inputNomeEmpresa = document.getElementById("regEmpresa");
 const inputNomeUsuario = document.getElementById("regNome");
 const grupoNome = document.getElementById("grupoNome");
@@ -41,13 +38,12 @@ const btnConfirmarCadastro = document.getElementById("btnConfirmarCadastro");
 const btnVoltar = document.getElementById("btnVoltar");
 const btnToggleSenha = document.getElementById("btnToggleSenha");
 
-// Elementos da barra de requisitos de senha
 const containerRequisitosSenha = document.getElementById("containerRequisitosSenha");
 const barraForcaSenha = document.getElementById("barraForcaSenha");
 const textoRequisitosSenha = document.getElementById("textoRequisitosSenha");
 
 // Estado da Aplicação
-let modoAtual = "login"; // Pode ser "login" ou "cadastro"
+let modoAtual = "login"; 
 
 let dadosTemporarios = {
     nome: "",
@@ -65,9 +61,6 @@ if (btnToggleSenha) btnToggleSenha.addEventListener("click", alternarVisibilidad
 if (btnAlternarModo) btnAlternarModo.addEventListener("click", alternarModoAbas);
 if (inputSenha) inputSenha.addEventListener("input", gerenciarMedidorSenha);
 
-/**
- * Alterna visualmente entre os modos de Login e Cadastro
- */
 function alternarModoAbas(e) {
     if (e) e.preventDefault();
     
@@ -83,7 +76,6 @@ function alternarModoAbas(e) {
         if (btnAlternarModo) btnAlternarModo.innerText = "Faça Login";
         if (containerRequisitosSenha) containerRequisitosSenha.style.display = "block";
         
-        // Exibe os novos campos criados para coletar os dados do Tenant
         if (grupoNome) grupoNome.style.display = "block";
         if (grupoEmpresa) grupoEmpresa.style.display = "block";
         
@@ -96,15 +88,11 @@ function alternarModoAbas(e) {
         if (textoAlternar) textoAlternar.innerText = "Não tem uma conta?";
         if (btnAlternarModo) btnAlternarModo.innerText = "Cadastre-se";
         
-        // Oculta os campos deixando a tela limpa apenas com e-mail e senha para login
         if (grupoNome) grupoNome.style.display = "none";
         if (grupoEmpresa) grupoEmpresa.style.display = "none";
     }
 }
 
-/**
- * Controla a visibilidade do input de senha (Olho)
- */
 function alternarVisibilidadeSenha() {
     if (inputSenha.type === "password") {
         inputSenha.type = "text";
@@ -115,9 +103,6 @@ function alternarVisibilidadeSenha() {
     }
 }
 
-/**
- * Validador de Regras de Segurança: Letras Maiúsculas, Sequências e Repetições
- */
 function analisarRegrasSenha(senha) {
     const temMaiuscula = /[A-Z]/.test(senha);
     const temRepeticao = /(\w)\1\1/.test(senha);
@@ -132,13 +117,9 @@ function analisarRegrasSenha(senha) {
             break;
         }
     }
-
     return { temMaiuscula, temRepeticao, temSequencia };
 }
 
-/**
- * Controla visualmente o medidor de força (Barrinha Colorida)
- */
 function gerenciarMedidorSenha() {
     if (modoAtual !== "cadastro" || !barraForcaSenha) return;
 
@@ -168,14 +149,12 @@ function gerenciarMedidorSenha() {
 }
 
 /**
- * Processador central: Decide se autentica direto ou se exige nova validação
+ * 🚀 PROCESSADOR CENTRAL CONECTADO AO FIREBASE
  */
 function processarAutenticacao(e) {
-    if (e && typeof e.preventDefault === 'function') {
-        e.preventDefault();
-    }
+    if (e && typeof e.preventDefault === 'function') e.preventDefault();
 
-    const email = inputEmail.value.trim();
+    const email = inputEmail.value.trim().toLowerCase();
     const senha = inputSenha.value;
 
     if (!email || !email.includes("@")) {
@@ -183,112 +162,120 @@ function processarAutenticacao(e) {
         return;
     }
 
-    let usuarios = JSON.parse(localStorage.getItem("veltrix_usuarios")) || [];
-    const usuarioExistente = usuarios.find(u => u.email === email);
-
-    // --- FLUXO 1: MODO LOGIN ATIVO ---
-    if (modoAtual === "login") {
-        if (!usuarioExistente) {
-            alert("Este e-mail não está cadastrado. Mudamos para o modo de Cadastro.");
-            modoAtual = "login"; 
-            alternarModoAbas(); 
-            return;
-        }
-        
-        if (usuarioExistente.senha !== senha) {
-            alert("Senha incorreta para este usuário.");
-            return;
-        }
-
-        // Recupera e injeta dinamicamente os dados reais salvos no cadastro
-        const estruturaSessao = {
-            nome: usuarioExistente.nome || "Gestor",
-            perfil: "Administrador",
-            empresa: usuarioExistente.empresa || "Estabelecimento"
-        };
-
-        // Salva de forma persistente no localStorage
-        localStorage.setItem("usuarioLogado", JSON.stringify(estruturaSessao));
-        alert("Login efetuado com sucesso! Redirecionando...");
-        window.location.href = "dashboard.html";
-        return;
-    }
-
-    // --- FLUXO 2: MODO CADASTRO ATIVO ---
-    if (usuarioExistente) {
-        alert("Este e-mail já possui cadastro ativo. Por favor, faça login direto.");
-        modoAtual = "cadastro"; 
-        alternarModoAbas();   
-        return;
-    }
-
-    // Captura e validação real dos dados digitados nos novos campos expostos
-    const nomeUsuario = inputNomeUsuario ? inputNomeUsuario.value.trim() : "";
-    const nomeEmpresa = inputNomeEmpresa ? inputNomeEmpresa.value.trim() : "";
-
-    if (!nomeUsuario || !nomeEmpresa) {
-        alert("Por favor, preencha o seu nome e o nome do seu estabelecimento.");
-        return;
-    }
-
-    // Validações de segurança de senha
-    if (senha.length < 6) {
-        alert("A senha precisa ter no mínimo 6 caracteres.");
-        return;
-    }
-
-    const { temMaiuscula, temRepeticao, temSequencia } = analisarRegrasSenha(senha);
-
-    if (!temMaiuscula) {
-        alert("Sua nova senha deve conter pelo menos uma letra MAIÚSCULA.");
-        return;
-    }
-    if (temRepeticao) {
-        alert("Por motivos de segurança, não use sequências repetidas na senha (Ex: 111, aaa).");
-        return;
-    }
-    if (temSequencia) {
-        alert("Senha fraca detectada! Evite usar sequências numéricas ou de letras (Ex: 123, abc, 654).");
-        return;
-    }
-
-    // Gerador de OTP Token
-    const codigoSecreto = Math.floor(100000 + Math.random() * 900000).toString();
-
-    dadosTemporarios.nome = nomeUsuario;
-    dadosTemporarios.email = email;
-    dadosTemporarios.senha = senha;
-    dadosTemporarios.empresa = nomeEmpresa;
-    dadosTemporarios.codigoGerado = codigoSecreto;
-
-    btnEnviarCodigo.innerText = "Enviando e-mail...";
+    btnEnviarCodigo.innerText = "Aguarde, verificando...";
     btnEnviarCodigo.disabled = true;
 
-    const parametrosTemplate = {
-        to_email: email,
-        verification_code: codigoSecreto
-    };
+    // CONSULTA EM NUVEM: Procura o usuário direto na coleção 'veltrix_usuarios' do Firestore
+    db.collection("veltrix_usuarios").doc(email).get()
+        .then((doc) => {
+            const usuarioExistente = doc.exists ? doc.data() : null;
 
-    console.log("Iniciando requisição EmailJS para:", email);
+            // --- FLUXO 1: MODO LOGIN ---
+            if (modoAtual === "login") {
+                if (!usuarioExistente) {
+                    alert("Este e-mail não está cadastrado no sistema. Mudamos para a tela de Cadastro.");
+                    btnEnviarCodigo.innerText = "Entrar Direto";
+                    btnEnviarCodigo.disabled = false;
+                    modoAtual = "login"; 
+                    alternarModoAbas(); 
+                    return;
+                }
+                
+                if (usuarioExistente.senha !== senha) {
+                    alert("Senha incorreta.");
+                    btnEnviarCodigo.innerText = "Entrar Direto";
+                    btnEnviarCodigo.disabled = false;
+                    return;
+                }
 
-    emailjs.send("service_65tw8a6", "template_kvb78jx", parametrosTemplate)
+                // Cria sessão com os dados vindos direto do servidor Google
+                const estruturaSessao = {
+                    nome: usuarioExistente.nome || "Gestor",
+                    perfil: "Administrador",
+                    empresa: usuarioExistente.empresa || "Estabelecimento",
+                    email: email
+                };
+
+                localStorage.setItem("usuarioLogado", JSON.stringify(estruturaSessao));
+                alert("Login efetuado na Nuvem! Redirecionando...");
+                window.location.href = "dashboard.html";
+                return;
+            }
+
+            // --- FLUXO 2: MODO CADASTRO ---
+            if (usuarioExistente) {
+                alert("Este e-mail já possui cadastro ativo na nuvem. Faça login direto.");
+                btnEnviarCodigo.innerText = "Enviar Código de Verificação";
+                btnEnviarCodigo.disabled = false;
+                modoAtual = "cadastro"; 
+                alternarModoAbas();   
+                return;
+            }
+
+            const nomeUsuario = inputNomeUsuario ? inputNomeUsuario.value.trim() : "";
+            const nomeEmpresa = inputNomeEmpresa ? inputNomeEmpresa.value.trim() : "";
+
+            if (!nomeUsuario || !nomeEmpresa) {
+                alert("Por favor, preencha o seu nome e o nome do seu estabelecimento.");
+                btnEnviarCodigo.innerText = "Enviar Código de Verificação";
+                btnEnviarCodigo.disabled = false;
+                return;
+            }
+
+            if (senha.length < 6) {
+                alert("A senha precisa ter no mínimo 6 caracteres.");
+                btnEnviarCodigo.innerText = "Enviar Código de Verificação";
+                btnEnviarCodigo.disabled = false;
+                return;
+            }
+
+            const { temMaiuscula, temRepeticao, temSequencia } = analisarRegrasSenha(senha);
+            if (!temMaiuscula || temRepeticao || temSequencia) {
+                alert("A senha não atende aos critérios de segurança anti-fraude.");
+                btnEnviarCodigo.innerText = "Enviar Código de Verificação";
+                btnEnviarCodigo.disabled = false;
+                return;
+            }
+
+            // Gerador de OTP Token
+            const codigoSecreto = Math.floor(100000 + Math.random() * 900000).toString();
+
+            dadosTemporarios.nome = nomeUsuario;
+            dadosTemporarios.email = email;
+            dadosTemporarios.senha = senha;
+            dadosTemporarios.empresa = nomeEmpresa;
+            dadosTemporarios.codigoGerado = codigoSecreto;
+
+            btnEnviarCodigo.innerText = "Enviando e-mail...";
+
+            const parametrosTemplate = {
+                to_email: email,
+                verification_code: codigoSecreto
+            };
+
+            return emailjs.send("service_65tw8a6", "template_kvb78jx", parametrosTemplate);
+        })
         .then((response) => {
-            console.log("Sucesso EmailJS:", response);
-            alert("Código de verificação enviado com sucesso!");
-            alternarTelas(true);
+            if (response) {
+                console.log("Sucesso EmailJS:", response);
+                alert("Código de verificação enviado com sucesso!");
+                alternarTelas(true);
+            }
         })
         .catch((erro) => {
-            console.error("Erro interno no envio:", erro);
-            alert("Falha ao enviar e-mail. Resposta do servidor: " + (erro.text || JSON.stringify(erro)));
+            console.error("Erro no processo de autenticação:", erro);
+            alert("Erro na operação de segurança. Verifique o console.");
         })
         .finally(() => {
-            btnEnviarCodigo.innerText = modoAtual === "cadastro" ? "Enviar Código de Verificação" : "Entrar Direto";
-            btnEnviarCodigo.disabled = false;
+            if (btnEnviarCodigo) {
+                btnEnviarCodigo.innerText = modoAtual === "cadastro" ? "Enviar Código de Verificação" : "Entrar Direto";
+                btnEnviarCodigo.disabled = false;
+            }
         });
 }
 
 /**
- * Validação final do OTP para gravação permanente do novo registro
+ * ☁️ CRIAÇÃO DO DOCUMENTO EM NUVEM APÓS VALIDAR OTP
  */
 function validarCodigoEEntrar() {
     const codigoDigitado = inputCodigo.value.trim();
@@ -298,33 +285,39 @@ function validarCodigoEEntrar() {
         return;
     }
 
-    let usuarios = JSON.parse(localStorage.getItem("veltrix_usuarios")) || [];
-    
+    btnConfirmarCadastro.innerText = "Salvando na Nuvem...";
+    btnConfirmarCadastro.disabled = true;
+
     const novoUsuario = {
         nome: dadosTemporarios.nome,
         email: dadosTemporarios.email,
         senha: dadosTemporarios.senha,
-        empresa: dadosTemporarios.empresa
+        empresa: dadosTemporarios.empresa,
+        criadoEm: firebase.firestore.FieldValue.serverTimestamp() // Adiciona data automática do servidor Google
     };
 
-    usuarios.push(novoUsuario);
-    localStorage.setItem("veltrix_usuarios", JSON.stringify(usuarios));
+    // GRAVAÇÃO EM NUVEM: Cria o documento usando o e-mail como ID fixo
+    db.collection("veltrix_usuarios").doc(dadosTemporarios.email).set(novoUsuario)
+        .then(() => {
+            const estruturaSessao = {
+                nome: dadosTemporarios.nome,
+                perfil: "Administrador",
+                empresa: dadosTemporarios.empresa,
+                email: dadosTemporarios.email
+            };
+            localStorage.setItem("usuarioLogado", JSON.stringify(estruturaSessao));
 
-    // Salva de forma permanente vinculando e transportando os dados para o Dashboard
-    const estruturaSessao = {
-        nome: dadosTemporarios.nome,
-        perfil: "Administrador",
-        empresa: dadosTemporarios.empresa
-    };
-    localStorage.setItem("usuarioLogado", JSON.stringify(estruturaSessao));
-
-    alert("Conta criada com sucesso! Bem-vindo ao ecossistema VELTRIX.");
-    window.location.href = "dashboard.html"; 
+            alert("Conta criada com sucesso na Nuvem Google! Bem-vindo ao ecossistema VELTRIX.");
+            window.location.href = "dashboard.html";
+        })
+        .catch((erro) => {
+            console.error("Erro ao salvar no Firestore:", erro);
+            alert("Erro ao salvar dados na nuvem: " + erro.message);
+            btnConfirmarCadastro.innerText = "Confirmar e Criar Conta";
+            btnConfirmarCadastro.disabled = false;
+        });
 }
 
-/**
- * Chaveador de seções visuais
- */
 function alternarTelas(mostrarVerificacao) {
     if (mostrarVerificacao) {
         if (secaoCredenciais) secaoCredenciais.style.display = "none";
@@ -336,15 +329,10 @@ function alternarTelas(mostrarVerificacao) {
     }
 }
 
-/**
- * FUNÇÃO DE LOGOUT COMPLETA E EXPLICITA
- * Remove a sessão e redireciona o usuário de volta à tela de login/index
- */
 function fazerLogout() {
     localStorage.removeItem("usuarioLogado");
     alert("Sessão encerrada com sucesso.");
-    window.location.href = "index.html"; // ou o nome da sua página de login principal
+    window.location.href = "index.html";
 }
 
-// Expõe a função para ser chamada via HTML (ex: onclick="fazerLogout()")
 window.fazerLogout = fazerLogout;
