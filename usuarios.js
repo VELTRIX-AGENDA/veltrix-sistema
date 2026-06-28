@@ -4,7 +4,7 @@
  */
 
 /**
- * 1. FUNÇÃO DE ALTERNAR SENHA (ISOLADA NO TOPO)
+ * 1. FUNÇÃO DE ALTERNAR SENHA
  */
 function alternarVisibilidadeSenha() {
     const campoSenha = document.getElementById("senhaUsuario");
@@ -22,47 +22,47 @@ function alternarVisibilidadeSenha() {
 }
 
 /**
- * 2. ESTADO GLOBAL E CAPTURA DO DOM
+ * 2. INICIALIZAÇÃO SEGURA
  */
-const listaUsuariosContainer = document.getElementById("listaUsuarios");
-const btnSalvarUsuario = document.getElementById("btnSalvarUsuario");
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", inicializarModulo);
+} else {
+    inicializarModulo();
+}
 
-const selectNome = document.getElementById("nomeUsuario");
-const inputEmail = document.getElementById("emailUsuario");
-const inputSenha = document.getElementById("senhaUsuario");
-const inputPerfil = document.getElementById("perfilUsuario");
-
-/**
- * 3. INICIALIZAÇÃO
- */
-document.addEventListener("DOMContentLoaded", () => {
+function inicializarModulo() {
     popularSelectProfissionais();
     renderizarListaUsuarios();
     
+    const btnSalvarUsuario = document.getElementById("btnSalvarUsuario");
     if (btnSalvarUsuario) {
         btnSalvarUsuario.onclick = processarCadastroUsuario;
     }
-});
+}
 
 /**
- * Busca profissionais cadastrados no localStorage e popula o select
+ * 3. BUSCA E ALIMENTAÇÃO DOS PROFISSIONAIS
  */
 function popularSelectProfissionais() {
+    const selectNome = document.getElementById("nomeUsuario");
     if (!selectNome) return;
 
-    // Varre chaves possíveis que você possa estar usando para salvar sua equipe
+    // Varre todas as variações possíveis de chaves do seu banco local
     const profissionais = JSON.parse(localStorage.getItem("barbeiros")) || 
-                          JSON.parse(localStorage.getItem("profissionais")) || [];
+                          JSON.parse(localStorage.getItem("profissionais")) || 
+                          JSON.parse(localStorage.getItem("equipe")) || [];
 
     let htmlOpcoes = `<option value="">Selecione um profissional</option>`;
     
-    profissionais.forEach(prof => {
-        if (prof.nome) {
-            htmlOpcoes += `<option value="${prof.nome}">${prof.nome}</option>`;
-        }
-    });
+    if (profissionais.length > 0) {
+        profissionais.forEach(prof => {
+            if (prof.nome) {
+                htmlOpcoes += `<option value="${prof.nome}">${prof.nome}</option>`;
+            }
+        });
+    }
 
-    // Permite criar um login administrativo que não necessariamente corta cabelo
+    // Garante que a opção padrão administrativa sempre exista
     htmlOpcoes += `<option value="Administrador Geral">Administrador Geral (Sem vínculo)</option>`;
     
     selectNome.innerHTML = htmlOpcoes;
@@ -73,6 +73,13 @@ function obterUsuariosDoBanco() {
 }
 
 function processarCadastroUsuario() {
+    const selectNome = document.getElementById("nomeUsuario");
+    const inputEmail = document.getElementById("emailUsuario");
+    const inputSenha = document.getElementById("senhaUsuario");
+    const inputPerfil = document.getElementById("perfilUsuario");
+
+    if (!selectNome || !inputEmail || !inputSenha || !inputPerfil) return;
+
     const nome = selectNome.value;
     const email = inputEmail.value.trim().toLowerCase();
     const senha = inputSenha.value.trim();
@@ -106,7 +113,9 @@ function processarCadastroUsuario() {
 }
 
 function renderizarListaUsuarios() {
+    const listaUsuariosContainer = document.getElementById("listaUsuarios");
     if (!listaUsuariosContainer) return;
+    
     listaUsuariosContainer.innerHTML = "";
     const usuarios = obterUsuariosDoBanco();
 
@@ -148,6 +157,11 @@ function eliminarUsuario(emailUsuario) {
 }
 
 function limparFormularioUsuarios() {
+    const selectNome = document.getElementById("nomeUsuario");
+    const inputEmail = document.getElementById("emailUsuario");
+    const inputSenha = document.getElementById("senhaUsuario");
+    const inputPerfil = document.getElementById("perfilUsuario");
+
     if(selectNome) selectNome.value = "";
     if(inputEmail) inputEmail.value = "";
     if(inputSenha) inputSenha.value = "";
