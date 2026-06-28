@@ -25,22 +25,27 @@ carregarBarbeirosNuvem();
 escutarAgendamentosDoDia();
 
 // Listeners
-campoServico.addEventListener("change", function () {
-    const opcaoSelecionada = campoServico.options[campoServico.selectedIndex];
-    const tempo = opcaoSelecionada.getAttribute("data-tempo");
-    tempoServico.innerText = tempo ? `Tempo estimado: ${tempo} minutos` : "";
-    gerarHorariosDisponiveis();
-});
+if (campoServico) {
+    campoServico.addEventListener("change", function () {
+        const opcaoSelecionada = campoServico.options[campoServico.selectedIndex];
+        const tempo = opcaoSelecionada ? opcaoSelecionada.getAttribute("data-tempo") : null;
+        tempoServico.innerText = tempo ? `Tempo estimado: ${tempo} minutos` : "";
+        gerarHorariosDisponiveis();
+    });
+}
 
-document.getElementById("data").addEventListener("change", gerarHorariosDisponiveis);
-document.getElementById("barbeiro").addEventListener("change", gerarHorariosDisponiveis);
+const campoDataInput = document.getElementById("data");
+if (campoDataInput) campoDataInput.addEventListener("change", gerarHorariosDisponiveis);
+
+const campoBarbeiroInput = document.getElementById("barbeiro");
+if (campoBarbeiroInput) campoBarbeiroInput.addEventListener("change", gerarHorariosDisponiveis);
 
 /**
  * 🔒 TRAVA 1: Impede a escolha de qualquer data anterior a hoje no calendário
  */
 function configurarTravaCalendario() {
     const campoData = document.getElementById("data");
-    if (campoData) {
+    if (campoData && typeof VELTRIX_UTILS !== 'undefined') {
         const hoje = VELTRIX_UTILS.formatarDataParaInput(new Date());
         campoData.min = hoje; // Desabilita dias passados visualmente
     }
@@ -53,10 +58,14 @@ function configurarAmbientePorUsuario() {
         if (menuInf) menuInf.style.display = "none";
         if (btnVoltar) btnVoltar.style.display = "none";
         
-        document.getElementById("subtituloHeader").innerText = "Reserve seu horário em menos de 1 minuto";
-        document.getElementById("tituloHero").innerText = "Olá! Seja Bem-vindo(a)";
-        document.getElementById("textoHero").innerText = "Escolha os detalhes abaixo para agendar seu atendimento de forma simples.";
-        botaoSalvar.innerText = "Concluir e Agendar";
+        const subtituloHeader = document.getElementById("subtituloHeader");
+        const tituloHero = document.getElementById("tituloHero");
+        const textoHero = document.getElementById("textoHero");
+        
+        if (subtituloHeader) subtituloHeader.innerText = "Reserve seu horário em menos de 1 minuto";
+        if (tituloHero) tituloHero.innerText = "Olá! Seja Bem-vindo(a)";
+        if (textoHero) textoHero.innerText = "Escolha os detalhes abaixo para agendar seu atendimento de forma simples.";
+        if (botaoSalvar) botaoSalvar.innerText = "Concluir e Agendar";
     }
 }
 
@@ -72,104 +81,108 @@ function escutarAgendamentosDoDia() {
                 agendamentosNuvem.push(doc.data());
             });
             gerarHorariosDisponiveis(); // Recalcula a grade quando houver novos agendamentos
+        }, erro => {
+            console.log("Aguardando inicialização das tabelas: ", erro.message);
         });
 }
 
 /**
  * 🚀 SALVAMENTO NA NUVEM COM VERIFICAÇÃO DE SEGURANÇA SEVERA
  */
-botaoSalvar.addEventListener("click", function () {
-    const nome = document.getElementById("nome").value.trim();
-    const telefone = document.getElementById("telefone").value.trim();
-    const servico = document.getElementById("servico").value;
-    const opcaoServico = campoServico.options[campoServico.selectedIndex];
-    const tempo = opcaoServico ? opcaoServico.getAttribute("data-tempo") : null;
-    const preco = opcaoServico ? opcaoServico.getAttribute("data-preco") : null;
-    const barbeiro = document.getElementById("barbeiro").value;
-    const data = document.getElementById("data").value;
-    const horario = document.getElementById("horario").value;
-    const observacao = document.getElementById("observacao").value.trim();
+if (botaoSalvar) {
+    botaoSalvar.addEventListener("click", function () {
+        const nome = document.getElementById("nome").value.trim();
+        const telefone = document.getElementById("telefone").value.trim();
+        const servico = document.getElementById("servico").value;
+        const opcaoServico = campoServico.options[campoServico.selectedIndex];
+        const tempo = opcaoServico ? opcaoServico.getAttribute("data-tempo") : null;
+        const preco = opcaoServico ? opcaoServico.getAttribute("data-preco") : null;
+        const barbeiro = document.getElementById("barbeiro").value;
+        const data = document.getElementById("data").value;
+        const horario = document.getElementById("horario").value;
+        const observacao = document.getElementById("observacao").value.trim();
 
-    if (!nome) return alert("Por favor, digite seu nome.");
-    if (!telefone) return alert("Por favor, digite seu telefone/WhatsApp.");
-    if (!servico) return alert("Selecione o serviço desejado.");
-    if (!barbeiro) return alert("Escolha o profissional de sua preferência.");
-    if (!data) return alert("Selecione o dia do atendimento.");
-    if (!validarDataCompleta(data)) return alert("Selecione uma data válida.");
-    if (!horario) return alert("Escolha um horário disponível.");
+        if (!nome) return alert("Por favor, digite seu nome.");
+        if (!telefone) return alert("Por favor, digite seu telefone/WhatsApp.");
+        if (!servico) return alert("Selecione o serviço desejado.");
+        if (!barbeiro) return alert("Escolha o profissional de sua preferência.");
+        if (!data) return alert("Selecione o dia do atendimento.");
+        if (!validarDataCompleta(data)) return alert("Selecione uma data válida.");
+        if (!horario) return alert("Escolha um horário disponível.");
 
-    // 🔒 TRAVA BACKEND-CLIENT: Impede o agendamento se o horário/data inserido for menor que o momento do clique
-    const agora = new Date();
-    const dataHojeStr = VELTRIX_UTILS.formatarDataParaInput(agora);
-    const horaAtualMinutos = (agora.getHours() * 60) + agora.getMinutes();
-    const novoInicio = converterHorarioParaMinutos(horario);
-    const novoFim = novoInicio + Number(tempo);
+        // 🔒 TRAVA BACKEND-CLIENT: Impede o agendamento se o horário/data inserido for menor que o momento do clique
+        const agora = new Date();
+        const dataHojeStr = VELTRIX_UTILS.formatarDataParaInput(agora);
+        const horaAtualMinutos = (agora.getHours() * 60) + agora.getMinutes();
+        const novoInicio = converterHorarioParaMinutos(horario);
+        const novoFim = novoInicio + Number(tempo);
 
-    if (data < dataHojeStr) {
-        return alert("Não é possível realizar agendamentos em datas passadas.");
-    }
-    if (data === dataHojeStr && novoInicio < horaAtualMinutos) {
-        return alert("Esse horário já passou. Escolha um horário futuro.");
-    }
-
-    // Validações de Escopo (Férias, Turno, Intervalo) obtidas da Nuvem/LocalStorage de apoio
-    const ferias = JSON.parse(localStorage.getItem("ferias")) || [];
-    const estaDeFerias = ferias.some(item => (item.profissional || item.barbeiro) === barbeiro && data >= item.dataInicial && data <= item.dataFinal);
-    if (estaDeFerias) return alert("Este profissional está ausente nesta data.");
-
-    const disponibilidadeDoDia = obterDisponibilidadeDoDia(barbeiro, data);
-    if (!disponibilidadeDoDia) return alert("Este profissional não atende neste dia.");
-
-    if (conflitaComIntervalo(novoInicio, novoFim, disponibilidadeDoDia)) return alert("Horário coincide com o intervalo do profissional.");
-
-    // Algoritmo de Colisão Inteligente na Nuvem
-    const horarioOcupado = agendamentosNuvem.some(agendamento => {
-        const nomeProf = agendamento.profissional || agendamento.barbeiro;
-        if (nomeProf !== barbeiro || agendamento.data !== data) return false;
-        if (agendamento.status === "Cancelado") return false;
-        return novoInicio < (converterHorarioParaMinutos(agendamento.horario) + Number(agendamento.tempo)) && novoFim > converterHorarioParaMinutos(agendamento.horario);
-    });
-    if (horarioOcupado) return alert("Este horário acabou de ser preenchido por outro cliente.");
-
-    botaoSalvar.disabled = true;
-    botaoSalvar.innerText = "Agendando...";
-
-    // GRAVAÇÃO DA RESERVA NO CLOUD FIRESTORE
-    db.collection("veltrix_agendamentos").add({
-        tenantID: tenantID,
-        nome,
-        telefone,
-        servico,
-        tempo,
-        preco,
-        barbeiro,
-        profissional: barbeiro,
-        data,
-        horario,
-        observacao,
-        status: "Agendado",
-        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then(() => {
-        cadastrarClienteAutomaticamente(nome, telefone);
-
-        if (ModoCliente) {
-            document.getElementById("modalSucessoCliente").style.display = "flex";
-            const msgWhats = `Olá! Acabei de realizar meu agendamento pelo aplicativo da VELTRIX. 🎉\n\n👤 Nome: ${nome}\n💼 Serviço: ${servico}\n📅 Data: ${VELTRIX_UTILS.formatarDataParaExibicao(data)}\n⏰ Horário: ${horario}\n👤 Profissional: ${barbeiro}`;
-            setTimeout(() => {
-                window.location.href = `https://wa.me/${telefone}?text=${encodeURIComponent(msgWhats)}`;
-            }, 3500);
-        } else {
-            alert("Agendamento criado com sucesso!");
-            window.location.href = "agenda.html";
+        if (data < dataHojeStr) {
+            return alert("Não é possível realizar agendamentos em datas passadas.");
         }
-    })
-    .catch(erro => {
-        alert("Erro ao processar agendamento: " + erro.message);
-        botaoSalvar.disabled = false;
-        botaoSalvar.innerText = "Concluir e Agendar";
+        if (data === dataHojeStr && novoInicio < horaAtualMinutos) {
+            return alert("Esse horário já passou. Escolha um horário futuro.");
+        }
+
+        // Validações de Escopo (Férias, Turno, Intervalo) obtidas da Nuvem/LocalStorage de apoio
+        const ferias = JSON.parse(localStorage.getItem("ferias")) || [];
+        const estaDeFerias = ferias.some(item => (item.profissional || item.barbeiro) === barbeiro && data >= item.dataInicial && data <= item.dataFinal);
+        if (estaDeFerias) return alert("Este profissional está ausente nesta data.");
+
+        const disponibilidadeDoDia = obterDisponibilidadeDoDia(barbeiro, data);
+        if (!disponibilidadeDoDia) return alert("Este profissional não atende neste dia.");
+
+        if (conflitaComIntervalo(novoInicio, novoFim, disponibilidadeDoDia)) return alert("Horário coincide com o intervalo do profissional.");
+
+        // Algoritmo de Colisão Inteligente na Nuvem
+        const horarioOcupado = agendamentosNuvem.some(agendamento => {
+            const nomeProf = agendamento.profissional || agendamento.barbeiro;
+            if (nomeProf !== barbeiro || agendamento.data !== data) return false;
+            if (agendamento.status === "Cancelado") return false;
+            return novoInicio < (converterHorarioParaMinutos(agendamento.horario) + Number(agendamento.tempo)) && novoFim > converterHorarioParaMinutos(agendamento.horario);
+        });
+        if (horarioOcupado) return alert("Este horário acabou de ser preenchido por outro cliente.");
+
+        botaoSalvar.disabled = true;
+        botaoSalvar.innerText = "Agendando...";
+
+        // GRAVAÇÃO DA RESERVA NO CLOUD FIRESTORE
+        db.collection("veltrix_agendamentos").add({
+            tenantID: tenantID,
+            nome,
+            telefone,
+            servico,
+            tempo,
+            preco,
+            barbeiro,
+            profissional: barbeiro,
+            data,
+            horario,
+            observacao,
+            status: "Agendado",
+            criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        })
+        .then(() => {
+            cadastrarClienteAutomaticamente(nome, telefone);
+
+            if (ModoCliente) {
+                document.getElementById("modalSucessoCliente").style.display = "flex";
+                const msgWhats = `Olá! Acabei de realizar meu agendamento pelo aplicativo da VELTRIX. 🎉\n\n👤 Nome: ${nome}\n💼 Serviço: ${servico}\n📅 Data: ${VELTRIX_UTILS.formatarDataParaExibicao(data)}\n⏰ Horário: ${horario}\n👤 Profissional: ${barbeiro}`;
+                setTimeout(() => {
+                    window.location.href = `https://wa.me/${telefone}?text=${encodeURIComponent(msgWhats)}`;
+                }, 3500);
+            } else {
+                alert("Agendamento created com sucesso!");
+                window.location.href = "agenda.html";
+            }
+        })
+        .catch(erro => {
+            alert("Erro ao processar agendamento: " + erro.message);
+            botaoSalvar.disabled = false;
+            botaoSalvar.innerText = ModoCliente ? "Concluir e Agendar" : "Confirmar Agendamento";
+        });
     });
-});
+}
 
 /**
  * 🎨 CARREGAMENTO DINÂMICO DOS PROFISSIONAIS (FIRESTORE)
@@ -181,18 +194,17 @@ function carregarBarbeirosNuvem() {
     db.collection("veltrix_barbeiros").where("tenantID", "==", tenantID).get()
         .then(snapshot => {
             if (lista) lista.innerHTML = "";
-            if (campoBarbeiro) campoBarbeiro.innerHTML = '<option value="">Selecione o profissional</option>';
+            if (campoBarbeiro && campoBarbeiro.tagName === "SELECT") campoBarbeiro.innerHTML = '<option value="">Selecione o profissional</option>';
 
             snapshot.forEach((doc) => {
                 const prof = doc.data();
-                if (campoBarbeiro) {
+                if (campoBarbeiro && campoBarbeiro.tagName === "SELECT") {
                     campoBarbeiro.innerHTML += `<option value="${prof.nome}">${prof.nome}</option>`;
                 }
                 if (lista) {
                     const inicial = prof.nome.charAt(0).toUpperCase();
                     const fotoHtml = prof.foto ? `<img src="${prof.foto}" class="profissional-card-foto">` : `<div class="profissional-card-avatar">${inicial}</div>`;
                     
-                    // PASSAGEM DO 'this': Captura o próprio elemento DOM para ativação do CSS de feedback visual
                     lista.innerHTML += `
                         <div class="profissional-quadrado profesional-opcao" onclick="selecionarProfissional('${prof.nome}', this)">
                             ${fotoHtml}
@@ -201,7 +213,7 @@ function carregarBarbeirosNuvem() {
                     `;
                 }
             });
-        });
+        }).catch(err => console.log("Aguardando documentos de profissionais...", err.message));
 }
 
 /**
@@ -230,21 +242,27 @@ function selecionarProfissional(nome, elementoClicado) {
 function carregarServicosNuvem() {
     db.collection("veltrix_servicos").where("tenantID", "==", tenantID).get()
         .then(snapshot => {
+            if (!campoServico) return;
             campoServico.innerHTML = '<option value="">Selecione um serviço</option>';
             snapshot.forEach(doc => {
                 const serv = doc.data();
                 campoServico.innerHTML += `<option value="${serv.nome}" data-tempo="${serv.duracao}" data-preco="${serv.preco}">${serv.nome} - ${serv.duracao} min - ${VELTRIX_UTILS.formatarMoeda(serv.preco)}</option>`;
             });
-        });
+        }).catch(err => console.log("Aguardando documentos de serviços...", err.message));
 }
 
 /**
  * 🔒 TRAVA 2: Remove horários passados dinamicamente no dia corrente
  */
 function gerarHorariosDisponiveis() {
-    const barbeiro = document.getElementById("barbeiro").value;
-    const data = document.getElementById("data").value;
-    const servico = document.getElementById("servico").value;
+    const barbeiroSelect = document.getElementById("barbeiro");
+    const dataSelect = document.getElementById("data");
+    
+    if (!barbeiroSelect || !dataSelect || !campoServico) return;
+    
+    const barbeiro = barbeiroSelect.value;
+    const data = dataSelect.value;
+    const servico = campoServico.value;
     const horarioSelect = document.getElementById("horario");
 
     if (!horarioSelect) return;
@@ -259,7 +277,9 @@ function gerarHorariosDisponiveis() {
     const disponibilidade = obterDisponibilidadeDoDia(barbeiro, data);
     if (!disponibilidade) { horarioSelect.innerHTML = '<option value="">Sem expediente cadastrado</option>'; return; }
 
-    const tempo = Number(campoServico.options[campoServico.selectedIndex].getAttribute("data-tempo"));
+    const opcaoSelecionada = campoServico.options[campoServico.selectedIndex];
+    if (!opcaoSelecionada) return;
+    const tempo = Number(opcaoSelecionada.getAttribute("data-tempo"));
     let inicio = converterHorarioParaMinutos(disponibilidade.entrada);
     const fim = converterHorarioParaMinutos(disponibilidade.saida);
 
@@ -312,7 +332,7 @@ function converterHorarioParaMinutos(horario) {
 
 function converterMinutosParaHorario(minutosTotais) {
     const horas = Math.floor(minutosTotais / 60);
-    const minutos = minutesTotais = minutosTotais % 60;
+    const minutos = minutosTotais % 60; // CORRIGIDO: Removida atribuição fantasma que quebrava o script
     return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
 }
 
