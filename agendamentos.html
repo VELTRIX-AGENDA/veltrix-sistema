@@ -8,6 +8,29 @@
     <link rel="stylesheet" href="style.css">
     
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script>
+      // Chaves de conexão oficiais do seu projeto Veltrix
+      const firebaseConfig = {
+        apiKey: "AIzaSyCU8LKhLYIvhBZ4Lq0pBf7-VBKyYEF3cXg",
+        authDomain: "veltrix-agenda.firebaseapp.com",
+        projectId: "veltrix-agenda",
+        storageBucket: "veltrix-agenda.firebasestorage.app",
+        messagingSenderId: "73227155396",
+        appId: "1:73227155396:web:1c3a031abbbf3002c69691"
+      };
+
+      // Inicializa o Firebase se ainda não tiver sido inicializado
+      if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
+      }
+      
+      // Define a constante global db que o seu script de agendamento utiliza
+      const db = firebase.firestore();
+    </script>
 </head>
 
 <body class="app-page">
