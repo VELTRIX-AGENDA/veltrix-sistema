@@ -172,7 +172,7 @@ if (botaoSalvar) {
                     window.location.href = `https://wa.me/${telefone}?text=${encodeURIComponent(msgWhats)}`;
                 }, 3500);
             } else {
-                alert("Agendamento created com sucesso!");
+                alert("Agendamento criado com sucesso!");
                 window.location.href = "agenda.html";
             }
         })
@@ -185,7 +185,7 @@ if (botaoSalvar) {
 }
 
 /**
- * 🎨 CARREGAMENTO DINÂMICO DOS PROFISSIONAIS (FIRESTORE)
+ * 🎨 CARREGAMENTO DINÂMICO DOS PROFISSIONAIS (FIRESTORE COM BACKUP LOCAL)
  */
 function carregarBarbeirosNuvem() {
     const lista = document.getElementById("listaProfissionaisAgendamento");
@@ -196,24 +196,39 @@ function carregarBarbeirosNuvem() {
             if (lista) lista.innerHTML = "";
             if (campoBarbeiro && campoBarbeiro.tagName === "SELECT") campoBarbeiro.innerHTML = '<option value="">Selecione o profissional</option>';
 
-            snapshot.forEach((doc) => {
-                const prof = doc.data();
-                if (campoBarbeiro && campoBarbeiro.tagName === "SELECT") {
-                    campoBarbeiro.innerHTML += `<option value="${prof.nome}">${prof.nome}</option>`;
-                }
-                if (lista) {
-                    const inicial = prof.nome.charAt(0).toUpperCase();
-                    const fotoHtml = prof.foto ? `<img src="${prof.foto}" class="profissional-card-foto">` : `<div class="profissional-card-avatar">${inicial}</div>`;
-                    
-                    lista.innerHTML += `
-                        <div class="profissional-quadrado profesional-opcao" onclick="selecionarProfissional('${prof.nome}', this)">
-                            ${fotoHtml}
-                            <strong>${prof.nome}</strong>
-                        </div>
-                    `;
-                }
-            });
-        }).catch(err => console.log("Aguardando documentos de profissionais...", err.message));
+            if (!snapshot.empty) {
+                snapshot.forEach((doc) => {
+                    const prof = doc.data();
+                    renderizarBarbeiroNaTela(prof, lista, campoBarbeiro);
+                });
+            } else {
+                // BACKUP: Se a nuvem estiver vazia, carrega o que você já tem cadastrado no sistema
+                const barbeirosLocais = JSON.parse(localStorage.getItem("barbeiros")) || JSON.parse(localStorage.getItem("profissionais")) || [];
+                barbeirosLocais.forEach(prof => renderizarBarbeiroNaTela(prof, lista, campoBarbeiro));
+            }
+        }).catch(err => {
+            console.log("Buscando profissionais do cache local...", err.message);
+            const barbeirosLocais = JSON.parse(localStorage.getItem("barbeiros")) || JSON.parse(localStorage.getItem("profissionais")) || [];
+            if (lista) lista.innerHTML = "";
+            barbeirosLocais.forEach(prof => renderizarBarbeiroNaTela(prof, lista, campoBarbeiro));
+        });
+}
+
+function renderizarBarbeiroNaTela(prof, lista, campoBarbeiro) {
+    if (campoBarbeiro && campoBarbeiro.tagName === "SELECT") {
+        campoBarbeiro.innerHTML += `<option value="${prof.nome}">${prof.nome}</option>`;
+    }
+    if (lista) {
+        const inicial = prof.nome.charAt(0).toUpperCase();
+        const fotoHtml = prof.foto ? `<img src="${prof.foto}" class="profissional-card-foto">` : `<div class="profissional-card-avatar">${inicial}</div>`;
+        
+        lista.innerHTML += `
+            <div class="profissional-quadrado profesional-opcao" onclick="selecionarProfissional('${prof.nome}', this)">
+                ${fotoHtml}
+                <strong>${prof.nome}</strong>
+            </div>
+        `;
+    }
 }
 
 /**
@@ -239,16 +254,37 @@ function selecionarProfissional(nome, elementoClicado) {
     gerarHorariosDisponiveis();
 }
 
+/**
+ * 🎨 CARREGAMENTO DINÂMICO DOS SERVIÇOS (FIRESTORE COM BACKUP LOCAL)
+ */
 function carregarServicosNuvem() {
+    if (!campoServico) return;
+    campoServico.innerHTML = '<option value="">Selecione um serviço</option>';
+
     db.collection("veltrix_servicos").where("tenantID", "==", tenantID).get()
         .then(snapshot => {
-            if (!campoServico) return;
-            campoServico.innerHTML = '<option value="">Selecione um serviço</option>';
-            snapshot.forEach(doc => {
-                const serv = doc.data();
-                campoServico.innerHTML += `<option value="${serv.nome}" data-tempo="${serv.duracao}" data-preco="${serv.preco}">${serv.nome} - ${serv.duracao} min - ${VELTRIX_UTILS.formatarMoeda(serv.preco)}</option>`;
-            });
-        }).catch(err => console.log("Aguardando documentos de serviços...", err.message));
+            if (!snapshot.empty) {
+                snapshot.forEach(doc => {
+                    const serv = doc.data();
+                    renderizarServicoNoSelect(serv);
+                });
+            } else {
+                // BACKUP: Se a nuvem estiver vazia, carrega o que você já tem cadastrado no sistema
+                const servicosLocais = JSON.parse(localStorage.getItem("servicos")) || [];
+                servicosLocais.forEach(serv => renderizarServicoNoSelect(serv));
+            }
+        }).catch(err => {
+            console.log("Buscando serviços do cache local...", err.message);
+            const servicosLocais = JSON.parse(localStorage.getItem("servicos")) || [];
+            servicosLocais.forEach(serv => renderizarServicoNoSelect(serv));
+        });
+}
+
+function renderizarServicoNoSelect(serv) {
+    const duracao = serv.duracao || serv.tempo || 30;
+    const preco = serv.preco || 0;
+    const formatado = typeof VELTRIX_UTILS !== 'undefined' ? VELTRIX_UTILS.formatarMoeda(preco) : `R$ ${preco}`;
+    campoServico.innerHTML += `<option value="${serv.nome}" data-tempo="${duracao}" data-preco="${preco}">${serv.nome} - ${duracao} min - ${formatado}</option>`;
 }
 
 /**
@@ -332,7 +368,7 @@ function converterHorarioParaMinutos(horario) {
 
 function converterMinutosParaHorario(minutosTotais) {
     const horas = Math.floor(minutosTotais / 60);
-    const minutos = minutosTotais % 60; // CORRIGIDO: Removida atribuição fantasma que quebrava o script
+    const minutos = minutosTotais % 60;
     return `${String(horas).padStart(2, "0")}:${String(minutos).padStart(2, "0")}`;
 }
 
