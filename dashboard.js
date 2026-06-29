@@ -1,9 +1,36 @@
-const agendamentos = JSON.parse(localStorage.getItem("agendamentos")) || [];
+/**
+ * VELTRIX - Sistema de Agendamento Inteligente
+ * Módulo: Painel Analítico e Operacional (dashboard.js)
+ */
+
+// Captura a sessão do estabelecimento logado para isolamento Multi-Tenant
+const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
+const tenantID = usuarioLogado.empresa || "Geral";
+
+let agendamentos = [];
 const dashboardAtivos = document.getElementById("dashboardAtivos");
 
-atualizarIndicadores();
-mostrarAtendimentosAtivos();
-mostrarProximoAtendimento();
+// Inicialização Core Conectada ao Firestore
+escutarAgendamentosDashboard();
+
+/**
+ * ⏳ ESCUTA EM TEMPO REAL: Mantém o Dashboard atualizado sem precisar dar F5
+ */
+function escutarAgendamentosDashboard() {
+    db.collection("veltrix_agendamentos")
+        .where("tenantID", "==", tenantID)
+        .onSnapshot(snapshot => {
+            agendamentos = [];
+            snapshot.forEach(doc => {
+                agendamentos.push({ id: doc.id, ...doc.data() });
+            });
+            
+            // Dispara as atualizações da tela com os dados novos da nuvem
+            atualizarIndicadores();
+            mostrarAtendimentosAtivos();
+            mostrarProximoAtendimento();
+        }, erro => console.error("Erro ao sincronizar Firestore no Dashboard:", erro));
+}
 
 function obterDataHoje() {
     const hoje = new Date();
@@ -29,15 +56,14 @@ function atualizarIndicadores() {
     });
 
     let faturamento = 0;
-
     for (let i = 0; i < finalizados.length; i++) {
         faturamento += Number(finalizados[i].preco || 0);
     }
 
-    document.getElementById("totalHoje").innerText = agendamentosHoje.length;
-    document.getElementById("emAtendimento").innerText = emAtendimento.length;
-    document.getElementById("finalizadosHoje").innerText = finalizados.length;
-    document.getElementById("faturamentoHoje").innerText = "R$ " + faturamento.toFixed(2);
+    if (document.getElementById("totalHoje")) document.getElementById("totalHoje").innerText = agendamentosHoje.length;
+    if (document.getElementById("emAtendimento")) document.getElementById("emAtendimento").innerText = emAtendimento.length;
+    if (document.getElementById("finalizadosHoje")) document.getElementById("finalizadosHoje").innerText = finalizados.length;
+    if (document.getElementById("faturamentoHoje")) document.getElementById("faturamentoHoje").innerText = "R$ " + faturamento.toFixed(2);
 
     atualizarClientesEspeciais();
     atualizarMelhorProfissional(finalizados);
@@ -48,7 +74,6 @@ function atualizarClientesEspeciais() {
 
     for (let i = 0; i < agendamentos.length; i++) {
         const chave = agendamentos[i].telefone || agendamentos[i].nome.toLowerCase();
-
         if (!clientes[chave]) {
             clientes[chave] = [];
         }
@@ -66,7 +91,6 @@ function atualizarClientesEspeciais() {
         });
 
         let sequencia = 0;
-
         for (let i = 0; i < historico.length; i++) {
             if (historico[i].status === "Finalizado") {
                 sequencia++;
@@ -83,15 +107,16 @@ function atualizarClientesEspeciais() {
         }
     });
 
-    document.getElementById("clientesVip").innerText = vip;
-    document.getElementById("clientesRubi").innerText = rubi;
+    if (document.getElementById("clientesVip")) document.getElementById("clientesVip").innerText = vip;
+    if (document.getElementById("clientesRubi")) document.getElementById("clientesRubi").innerText = rubi;
 }
 
 function atualizarMelhorProfissional(finalizadosHoje) {
     const ranking = {};
 
     for (let i = 0; i < finalizadosHoje.length; i++) {
-        const profesional = finalizadosHoje[i].barbeiro;
+        const profesional = finalizadosHoje[i].profissional || finalizadosHoje[i].barbeiro;
+        if (!profesional) continue;
         const valor = Number(finalizadosHoje[i].preco || 0);
 
         if (!ranking[profesional]) {
@@ -105,6 +130,7 @@ function atualizarMelhorProfissional(finalizadosHoje) {
     });
 
     const campo = document.getElementById("melhorProfissional");
+    if (!campo) return;
 
     if (lista.length === 0) {
         campo.innerText = "-";
@@ -113,12 +139,16 @@ function atualizarMelhorProfissional(finalizadosHoje) {
     campo.innerText = lista[0][0];
 }
 
+/**
+ * 🎨 RENDERIZAÇÃO OPERACIONAL COM DIRETRIZ DE CORES UNIFICADA
+ */
 function mostrarAtendimentosAtivos() {
+    if (!dashboardAtivos) return;
+    dashboardAtivos.innerHTML = "";
+
     const ativos = agendamentos.filter(function (item) {
         return item.status === "Agendado" || item.status === "Em Atendimento";
     });
-
-    dashboardAtivos.innerHTML = "";
 
     if (ativos.length === 0) {
         dashboardAtivos.innerHTML = `
@@ -129,39 +159,50 @@ function mostrarAtendimentosAtivos() {
         return;
     }
 
-    agendamentos.forEach(function (item, i) {
-        if (item.status !== "Agendado" && item.status !== "Em Atendimento") {
-            return;
-        }
+    // Ordena os ativos por horário para exibição cronológica correta
+    ativos.sort((a, b) => a.horario.localeCompare(b.horario));
 
+    ativos.forEach(function (item) {
         const cardContainer = document.createElement("div");
         cardContainer.className = "dashboard-active-card";
-        cardContainer.setAttribute("onclick", `alternarAcoes(${i})`);
+        
+        // Define as cores com base na sua diretriz estrita
+        let corStatus = "#f1c40f"; // Amarelo para Agendado
+        if (item.status === "Em Atendimento") corStatus = "#3498db"; // Azul
+
+        // Aplica o estilo de borda dinamicamente no card container
+        cardContainer.style.borderLeft = `5px solid ${corStatus}`;
+        cardContainer.style.marginBottom = "15px";
+        cardContainer.style.padding = "15px";
+        cardContainer.style.background = "rgba(255, 255, 255, 0.03)";
+        cardContainer.style.borderRadius = "8px";
+
+        cardContainer.setAttribute("onclick", `alternarAcoes('${item.id}')`);
         
         const botaoWhats = item.telefone 
             ? `<button onclick="abrirWhats(event, '${item.telefone}', '${item.nome}')" style="display:inline-block; width:auto; padding:4px 10px; margin-left:10px; background:#25D366; color:white; border-radius:8px; font-size:11px; border:none; cursor:pointer; font-weight:bold;">🟢 Whats</button>` 
             : '';
 
+        const nomePrestador = item.profissional || item.barbeiro || "Geral";
+
         cardContainer.innerHTML = `
-            <div>
-                <strong>${item.nome}</strong> ${botaoWhats}
+            <div style="display: flex; justify-content: space-between; align-items: start;">
+                <div>
+                    <div>
+                        <strong style="font-size: 1.1em; color: #fff;">${item.nome}</strong> ${botaoWhats}
+                    </div>
+                    <span style="display: block; margin-top: 5px; color: #ddd; font-weight: bold;">${item.servico}</span>
+                    <span style="display: block; font-size: 0.9em; color: #aaa;">${nomePrestador} • ${VELTRIX_UTILS.formatarDataParaExibicao(item.data)} às ${item.horario}</span>
+                </div>
+                <span style="background: ${corStatus}; color: #000; font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 0.8em;">
+                    ${item.status}
+                </span>
             </div>
-            <span>${item.servico}</span>
-            <span>${item.barbeiro} • ${item.data} às ${item.horario}</span>
-            <small>Status: ${item.status}</small>
 
-            <div class="acoes-atendimento" id="acoes-${i}">
-                <button onclick="alterarStatusDashboard(event, ${i}, 'Em Atendimento')">
-                    Iniciar Atendimento
-                </button>
-
-                <button onclick="alterarStatusDashboard(event, ${i}, 'Finalizado')">
-                    Finalizar
-                </button>
-
-                <button onclick="alterarStatusDashboard(event, ${i}, 'Cancelado')">
-                    Cancelar
-                </button>
+            <div class="acoes-atendimento" id="acoes-${item.id}" style="margin-top: 12px;">
+                ${item.status === "Agendado" ? `<button onclick="alterarStatusDashboard(event, '${item.id}', 'Em Atendimento')">Iniciar Atendimento</button>` : ""}
+                ${item.status === "Em Atendimento" ? `<button onclick="alterarStatusDashboard(event, '${item.id}', 'Finalizado')">Finalizar</button>` : ""}
+                <button onclick="alterarStatusDashboard(event, '${item.id}', 'Cancelado')">Cancelar</button>
             </div>
         `;
         
@@ -169,23 +210,21 @@ function mostrarAtendimentosAtivos() {
     });
 }
 
-function alternarAcoes(posicao) {
-    const acoes = document.getElementById("acoes-" + posicao);
+function alternarAcoes(idDoc) {
+    const acoes = document.getElementById("acoes-" + idDoc);
     if (acoes) {
         acoes.classList.toggle("mostrar");
     }
 }
 
-function alterarStatusDashboard(event, posicao, novoStatus) {
+function alterarStatusDashboard(event, idDoc, novoStatus) {
     event.stopPropagation();
 
-    agendamentos[posicao].status = novoStatus;
-
-    localStorage.setItem("agendamentos", JSON.stringify(agendamentos));
-
-    atualizarIndicadores();
-    mostrarAtendimentosAtivos();
-    mostrarProximoAtendimento();
+    // Atualização direta e limpa na Nuvem (onSnapshot se encarrega de renderizar)
+    db.collection("veltrix_agendamentos").doc(idDoc).update({
+        status: novoStatus
+    })
+    .catch(erro => console.error("Erro ao alterar status no dashboard:", erro));
 }
 
 function mostrarProximoAtendimento() {
@@ -217,24 +256,23 @@ function mostrarProximoAtendimento() {
     }
 
     const proximo = futuros[0];
+    const nomePrestador = proximo.profissional || proximo.barbeiro || "Geral";
 
     proximoCliente.innerText = proximo.nome;
     proximoDetalhes.innerText =
         proximo.servico +
         " • " +
-        proximo.barbeiro +
+        nomePrestador +
         " • " +
-        proximo.data +
+        VELTRIX_UTILS.formatarDataParaExibicao(proximo.data) +
         " às " +
         proximo.horario;
 }
 
-// FUNÇÃO EXCLUSIVA MULTI-TENANT COM CÓDIGOS UNICODE À PROVA DE FALHAS
 function abrirWhats(event, telefone, nomeCliente) {
     event.stopPropagation(); 
     
-    const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado"));
-    const nomeEmpresaEstoque = usuarioLogado && usuarioLogado.empresa ? usuarioLogado.empresa : "nosso estabelecimento";
+    const nomeEmpresaEstoque = tenantID !== "Geral" ? tenantID : "nosso estabelecimento";
 
     const agendamentoCliente = agendamentos.find(function(item) {
         return (item.telefone === telefone || item.nome === nomeCliente) && 
@@ -242,29 +280,24 @@ function abrirWhats(event, telefone, nomeCliente) {
     });
 
     const servico = agendamentoCliente ? agendamentoCliente.servico : "Agendamento";
-    const barbeiro = agendamentoCliente ? agendamentoCliente.barbeiro : "Profissional";
+    const barbeiro = agendamentoCliente ? (agendamentoCliente.profissional || agendamentoCliente.barbeiro) : "Profissional";
     const horario = agendamentoCliente ? agendamentoCliente.horario : "--:--";
     
     let dataFormatada = "--/--/----";
     if (agendamentoCliente && agendamentoCliente.data) {
-        const partes = agendamentoCliente.data.split("-");
-        if (partes.length === 3) {
-            dataFormatada = partes[2] + "/" + partes[1] + "/" + partes[0];
-        }
+        dataFormatada = VELTRIX_UTILS.formatarDataParaExibicao(agendamentoCliente.data);
     }
 
     const numeroLimpo = telefone.replace(/\D/g, "");
     
-    // Mapeamento Unicode Hexadecimal para blindar e impedir caracteres quebrados (losangos)
-    const emojiBarber = "\u{1F487}"; // 💈
-    const emojiCalendar = "\u{1F4C5}"; // 📅
-    const emojiClock = "\u{23F1}"; // ⏰
-    const emojiScissors = "\u{2702}"; // ✂️
-    const emojiUser = "\u{1F464}"; // 👤
-    const emojiPin = "\u{1F4CC}"; // 📍
-    const emojiFire = "\u{1F525}"; // 🔥
+    const emojiBarber = "\u{1F487}"; 
+    const emojiCalendar = "\u{1F4C5}"; 
+    const emojiClock = "\u{23F1}"; 
+    const emojiScissors = "\u{2702}"; 
+    const emojiUser = "\u{1F464}"; 
+    const emojiPin = "\u{1F4CC}"; 
+    const emojiFire = "\u{1F525}"; 
 
-    // Montagem do texto estruturado utilizando os escapes mapeados acima
     let textoMensagem = "Olá, *" + nomeCliente + "*! " + emojiBarber + "\n\n";
     textoMensagem += "Seu atendimento foi confirmado com sucesso na *" + nomeEmpresaEstoque + "*. Confira os detalhes:\n\n";
     textoMensagem += emojiCalendar + " *Data:* " + dataFormatada + "\n";
@@ -274,7 +307,6 @@ function abrirWhats(event, telefone, nomeCliente) {
     textoMensagem += emojiPin + " _Por favor, tente chegar com 5 minutos de antecedência._\n\n";
     textoMensagem += "Obrigado pela preferência! Te esperamos em breve. " + emojiFire;
 
-    // Processamento e conversão de URI limpa
     const mensagemPronta = encodeURIComponent(textoMensagem);
     const urlWhats = "https://api.whatsapp.com/send?phone=55" + numeroLimpo + "&text=" + mensagemPronta;
     
