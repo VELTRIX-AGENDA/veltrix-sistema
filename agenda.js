@@ -9,7 +9,7 @@ const tenantID = usuarioLogado.empresa || "Geral";
 
 let agendamentos = [];
 let listaFiltrada = [];
-let indiceEditando = null; // Agora armazenará o ID do documento Firestore
+let indiceEditando = null; // Armazena o ID do documento Firestore
 
 // Seletores do DOM
 const listaAgenda = document.getElementById("listaAgenda");
@@ -176,8 +176,14 @@ function renderizarAgenda(lista) {
             const podeAlterar = status === "Agendado" || status === "Em Atendimento";
             const nomePrestador = agendamento.profissional || agendamento.barbeiro;
 
+            // Injeta cor de borda de acordo com o status atualizado
+            let corBorda = "#f1c40f"; // Amarelo
+            if (status === "Em Atendimento") corBorda = "#3498db"; // Azul
+            if (status === "Finalizado") corBorda = "#2ecc71"; // Verde
+            if (status === "Cancelado") corBorda = "#e74c3c"; // Vermelho
+
             listaAgenda.innerHTML += `
-                <div class="agenda-card" onclick="${podeAlterar ? `alternarAcoesAgenda('${docID}')` : ""}">
+                <div class="agenda-card" onclick="${podeAlterar ? `alternarAcoesAgenda('${docID}')` : ""}" style="border-left: 5px solid ${corBorda};">
                     <div class="agenda-card-topo">
                         <div>
                             <strong>${agendamento.horario}</strong>
@@ -192,8 +198,8 @@ function renderizarAgenda(lista) {
                     </div>
                     ${podeAlterar ? `
                         <div class="acoes-atendimento" id="acoes-agenda-${docID}">
-                            <button onclick="alterarStatusAgenda(event, '${docID}', 'Em Atendimento')">Iniciar Atendimento</button>
-                            <button onclick="alterarStatusAgenda(event, '${docID}', 'Finalizado')">Finalizar</button>
+                            ${status === "Agendado" ? `<button onclick="alterarStatusAgenda(event, '${docID}', 'Em Atendimento')">Iniciar Atendimento</button>` : ""}
+                            ${status === "Em Atendimento" ? `<button onclick="alterarStatusAgenda(event, '${docID}', 'Finalizado')">Finalizar</button>` : ""}
                             <button onclick="alterarStatusAgenda(event, '${docID}', 'Cancelado')">Cancelar</button>
                             <button onclick="abrirEdicaoAgendamento(event, '${docID}')">Editar</button>
                             <button onclick="enviarWhatsApp(event, '${docID}')">WhatsApp</button>
@@ -247,12 +253,11 @@ function salvarEdicaoAgendamento() {
         return;
     }
 
-    // SALVANDO NA NUVEM: Dá um update direto no documento específico
     db.collection("veltrix_agendamentos").doc(indiceEditando).update({
         nome: nome,
         telefone: telefone,
         servico: servico,
-        barbeiro: profesional,
+        barbeiro: profissional,
         profissional: profissional,
         data: data,
         horario: horario,
@@ -291,7 +296,6 @@ function gerarHorariosEdicao(horarioAtual = "") {
 
     if (!profesional || !data || !servico) return;
 
-    // Lógica para detecção do dia de hoje e hora do agora
     const agora = new Date();
     const dataHojeStr = VELTRIX_UTILS.formatarDataParaInput(agora);
     const horaAtualMinutos = (agora.getHours() * 60) + agora.getMinutes();
@@ -313,10 +317,9 @@ function gerarHorariosEdicao(horarioAtual = "") {
         const inicioNovo = inicio;
         const fimNovo = inicioNovo + tempo;
 
-        // VALIDAÇÃO CRUCIAL: Se for hoje, some com horários que já passaram
         if (data === dataHojeStr && inicioNovo < horaAtualMinutos) {
             inicio += 30;
-            continue; // Ignora e passa para o próximo slot de tempo
+            continue;
         }
 
         const dentroIntervalo = conflitaComIntervalo(inicioNovo, fimNovo, disponibilidade);
