@@ -232,7 +232,7 @@ function renderizarBarbeiroNaTela(prof, lista, campoBarbeiro) {
 }
 
 /**
- * 🎯 SELEÇÃO DE PROFISSIONAL COM FEEDBACK VISUAL CORRIGIDO
+ * 🎯 SELEÇÃO DE PROFISSIONAL COM FEEDBACK VISUAL EM TEMPO REAL CORRIGIDO
  */
 function selecionarProfissional(nome, elementoClicado) {
     const inputBarbeiro = document.getElementById("barbeiro");
@@ -240,14 +240,22 @@ function selecionarProfissional(nome, elementoClicado) {
     
     inputBarbeiro.value = nome;
     
-    // Remove a classe visual 'selecionado' de todos os cards da listagem
-    document.querySelectorAll(".profesional-opcao").forEach(card => {
+    // Captura o container do card principal caso o clique tenha caído nas tags internas (strong, img, div)
+    const cardAlvo = elementoClicado ? elementoClicado.closest(".profissional-quadrado") : null;
+    
+    // Remove a classe visual 'selecionado' e limpa estilos injetados de todos os elementos irmãos
+    document.querySelectorAll(".profissional-quadrado, .profesional-opcao").forEach(card => {
         card.classList.remove("selecionado");
+        card.style.border = "";
+        card.style.background = "";
     });
     
-    // Aplica a classe de destaque diretamente no card que recebeu o clique do usuário
-    if (elementoClicado) {
-        elementoClicado.classList.add("selecionado");
+    // Aplica o destaque imediatamente no elemento pai do card selecionado
+    if (cardAlvo) {
+        cardAlvo.classList.add("selecionado");
+        // Injeção de fallback inline estrutural para garantir que a mudança ocorra mesmo sem CSS carregado
+        cardAlvo.style.border = "2px solid #00ffff";
+        cardAlvo.style.background = "rgba(0, 255, 255, 0.12)";
     }
     
     // Dispara a atualização visual dos horários
@@ -281,9 +289,10 @@ function carregarServicosNuvem() {
 }
 
 function renderizarServicoNoSelect(serv) {
-    const duracao = serv.duracao || serv.tempo || 30;
-    const preco = serv.preco || 0;
-    const formatado = typeof VELTRIX_UTILS !== 'undefined' ? VELTRIX_UTILS.formatarMoeda(preco) : `R$ ${preco}`;
+    // Garante tipagem numérica mesmo se vier salvo como texto puro do Cloud Firestore
+    const duracao = Number(serv.duracao || serv.tempo || 30);
+    const preco = Number(serv.preco || 0);
+    const formatado = typeof VELTRIX_UTILS !== 'undefined' ? VELTRIX_UTILS.formatarMoeda(preco) : `R$ ${preco.toFixed(2).replace('.', ',')}`;
     campoServico.innerHTML += `<option value="${serv.nome}" data-tempo="${duracao}" data-preco="${preco}">${serv.nome} - ${duracao} min - ${formatado}</option>`;
 }
 
