@@ -1,20 +1,20 @@
 /**
  * VELTRIX - Sistema de Agendamento Inteligente
- * Módulo: Painel Analítico e Operacional (dashboard.js)
+ * Módulo: Painel Analítico e Operacional Cloud Pro (dashboard.js)
  */
 
-// Captura a sessão do estabelecimento logado para isolamento Multi-Tenant
+// Captura a sessão do estabelecimento logado para isolamento Multi-Tenant seguro
 const usuarioLogado = JSON.parse(localStorage.getItem("usuarioLogado")) || {};
 const tenantID = usuarioLogado.empresa || "Geral";
 
 let agendamentos = [];
 const dashboardAtivos = document.getElementById("dashboardAtivos");
 
-// Inicialização Core Conectada ao Firestore
+// Inicialização Conectada ao Firestore
 escutarAgendamentosDashboard();
 
 /**
- * ⏳ ESCUTA EM TEMPO REAL: Mantém o Dashboard atualizado sem precisar dar F5
+ * ⏳ ESCUTA EM TEMPO REAL: Monitoramento ativo do Cloud Firestore
  */
 function escutarAgendamentosDashboard() {
     db.collection("veltrix_agendamentos")
@@ -25,11 +25,30 @@ function escutarAgendamentosDashboard() {
                 agendamentos.push({ id: doc.id, ...doc.data() });
             });
             
-            // Dispara as atualizações da tela com os dados novos da nuvem
+            // Dispara as atualizações da tela com os dados normalizados da nuvem
             atualizarIndicadores();
             mostrarAtendimentosAtivos();
             mostrarProximoAtendimento();
         }, erro => console.error("Erro ao sincronizar Firestore no Dashboard:", erro));
+}
+
+/**
+ * 🛠️ HELPER DE NORMALIZAÇÃO: Garante correspondência de datas independente do input (AAAA-MM-DD)
+ */
+function normalizarDataParaISO(dataStr) {
+    if (!dataStr) return "";
+    // Se a data já estiver no formato correto AAAA-MM-DD
+    if (dataStr.includes("-") && dataStr.split("-")[0].length === 4) {
+        return dataStr;
+    }
+    // Se a data vier no formato PT-BR DD/MM/AAAA, converte para ISO
+    if (dataStr.includes("/")) {
+        const partes = dataStr.split("/");
+        if (partes.length === 3) {
+            return `${partes[2]}-${partes[1]}-${partes[0]}`;
+        }
+    }
+    return dataStr;
 }
 
 function obterDataHoje() {
@@ -43,8 +62,9 @@ function obterDataHoje() {
 function atualizarIndicadores() {
     const hoje = obterDataHoje();
 
+    // Filtro blindado contra divergência de formatação de string
     const agendamentosHoje = agendamentos.filter(function (item) {
-        return item.data === hoje;
+        return normalizarDataParaISO(item.data) === hoje;
     });
 
     const emAtendimento = agendamentosHoje.filter(function (item) {
@@ -85,8 +105,8 @@ function atualizarClientesEspeciais() {
 
     Object.values(clientes).forEach(function (historico) {
         historico.sort(function (a, b) {
-            const dataA = a.data + " " + a.horario;
-            const dataB = b.data + " " + b.horario;
+            const dataA = normalizarDataParaISO(a.data) + " " + a.horario;
+            const dataB = normalizarDataParaISO(b.data) + " " + b.horario;
             return dataA.localeCompare(dataB);
         });
 
@@ -115,14 +135,14 @@ function atualizarMelhorProfissional(finalizadosHoje) {
     const ranking = {};
 
     for (let i = 0; i < finalizadosHoje.length; i++) {
-        const profesional = finalizadosHoje[i].profissional || finalizadosHoje[i].barbeiro;
-        if (!profesional) continue;
+        const profissional = finalizadosHoje[i].profissional || finalizadosHoje[i].barbeiro;
+        if (!profissional) continue;
         const valor = Number(finalizadosHoje[i].preco || 0);
 
-        if (!ranking[profesional]) {
-            ranking[profesional] = 0;
+        if (!ranking[profissional]) {
+            ranking[profissional] = 0;
         }
-        ranking[profesional] += valor;
+        ranking[profissional] += valor;
     }
 
     const lista = Object.entries(ranking).sort(function (a, b) {
@@ -140,7 +160,7 @@ function atualizarMelhorProfissional(finalizadosHoje) {
 }
 
 /**
- * 🎨 RENDERIZAÇÃO OPERACIONAL COM DIRETRIZ DE CORES UNIFICADA
+ * 🎨 RENDERIZAÇÃO OPERACIONAL COM IDENTIDADE VISUAL ATUALIZADA
  */
 function mostrarAtendimentosAtivos() {
     if (!dashboardAtivos) return;
@@ -159,18 +179,17 @@ function mostrarAtendimentosAtivos() {
         return;
     }
 
-    // Ordena os ativos por horário para exibição cronológica correta
+    // Ordenação Cronológica Estrita
     ativos.sort((a, b) => a.horario.localeCompare(b.horario));
 
     ativos.forEach(function (item) {
         const cardContainer = document.createElement("div");
         cardContainer.className = "dashboard-active-card";
         
-        // Define as cores com base na sua diretriz estrita
         let corStatus = "#f1c40f"; // Amarelo para Agendado
         if (item.status === "Em Atendimento") corStatus = "#3498db"; // Azul
 
-        // Aplica o estilo de borda dinamicamente no card container
+        // Estilização injetada em conformidade com o CSS corporativo
         cardContainer.style.borderLeft = `5px solid ${corStatus}`;
         cardContainer.style.marginBottom = "15px";
         cardContainer.style.padding = "15px";
@@ -184,6 +203,7 @@ function mostrarAtendimentosAtivos() {
             : '';
 
         const nomePrestador = item.profissional || item.barbeiro || "Geral";
+        const dataExibicao = typeof VELTRIX_UTILS !== "undefined" ? VELTRIX_UTILS.formatarDataParaExibicao(item.data) : item.data;
 
         cardContainer.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: start;">
@@ -192,7 +212,7 @@ function mostrarAtendimentosAtivos() {
                         <strong style="font-size: 1.1em; color: #fff;">${item.nome}</strong> ${botaoWhats}
                     </div>
                     <span style="display: block; margin-top: 5px; color: #ddd; font-weight: bold;">${item.servico}</span>
-                    <span style="display: block; font-size: 0.9em; color: #aaa;">${nomePrestador} • ${VELTRIX_UTILS.formatarDataParaExibicao(item.data)} às ${item.horario}</span>
+                    <span style="display: block; font-size: 0.9em; color: #aaa;">Profissional: ${nomePrestador} • ${dataExibicao} às ${item.horario}</span>
                 </div>
                 <span style="background: ${corStatus}; color: #000; font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 0.8em;">
                     ${item.status}
@@ -219,8 +239,6 @@ function alternarAcoes(idDoc) {
 
 function alterarStatusDashboard(event, idDoc, novoStatus) {
     event.stopPropagation();
-
-    // Atualização direta e limpa na Nuvem (onSnapshot se encarrega de renderizar)
     db.collection("veltrix_agendamentos").doc(idDoc).update({
         status: novoStatus
     })
@@ -232,13 +250,13 @@ function mostrarProximoAtendimento() {
 
     const futuros = agendamentos
         .filter(function (item) {
-            return item.data >= hoje &&
+            return normalizarDataParaISO(item.data) >= hoje &&
                    item.status !== "Finalizado" &&
                    item.status !== "Cancelado";
         })
         .sort(function (a, b) {
-            const dataA = a.data + " " + a.horario;
-            const dataB = b.data + " " + b.horario;
+            const dataA = normalizarDataParaISO(a.data) + " " + a.horario;
+            const dataB = normalizarDataParaISO(b.data) + " " + b.horario;
             return dataA.localeCompare(dataB);
         });
 
@@ -257,6 +275,7 @@ function mostrarProximoAtendimento() {
 
     const proximo = futuros[0];
     const nomePrestador = proximo.profissional || proximo.barbeiro || "Geral";
+    const dataExibicao = typeof VELTRIX_UTILS !== "undefined" ? VELTRIX_UTILS.formatarDataParaExibicao(proximo.data) : proximo.data;
 
     proximoCliente.innerText = proximo.nome;
     proximoDetalhes.innerText =
@@ -264,7 +283,7 @@ function mostrarProximoAtendimento() {
         " • " +
         nomePrestador +
         " • " +
-        VELTRIX_UTILS.formatarDataParaExibicao(proximo.data) +
+        dataExibicao +
         " às " +
         proximo.horario;
 }
@@ -285,7 +304,7 @@ function abrirWhats(event, telefone, nomeCliente) {
     
     let dataFormatada = "--/--/----";
     if (agendamentoCliente && agendamentoCliente.data) {
-        dataFormatada = VELTRIX_UTILS.formatarDataParaExibicao(agendamentoCliente.data);
+        dataFormatada = typeof VELTRIX_UTILS !== "undefined" ? VELTRIX_UTILS.formatarDataParaExibicao(agendamentoCliente.data) : agendamentoCliente.data;
     }
 
     const numeroLimpo = telefone.replace(/\D/g, "");
