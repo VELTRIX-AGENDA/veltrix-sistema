@@ -14,24 +14,29 @@ const dashboardAtivos = document.getElementById("dashboardAtivos");
 escutarAgendamentosDashboard();
 
 /**
- * ⏳ ESCUTA EM TEMPO REAL: Monitoramento ativo do Cloud Firestore
+ * ⏳ ESCUTA EM TEMPO REAL (VERSÃO DIAGNÓSTICO SEM FILTROS)
  */
 function escutarAgendamentosDashboard() {
+    console.log("Iniciando escuta no Firestore... Tenant atual:", tenantID);
+    
+    // Removemos temporariamente o .where() para diagnosticar a estrutura
     db.collection("veltrix_agendamentos")
-        .where("tenantID", "==", tenantID)
         .onSnapshot(snapshot => {
             agendamentos = [];
+            console.log("Total de documentos encontrados na nuvem:", snapshot.size);
+            
             snapshot.forEach(doc => {
-                agendamentos.push({ id: doc.id, ...doc.data() });
+                const dados = doc.data();
+                console.log("Documento lido:", doc.id, dados); // Mostra a estrutura real no console do navegador
+                agendamentos.push({ id: doc.id, ...dados });
             });
             
-            // Dispara as atualizações da tela com os dados normalizados da nuvem
+            // Dispara as atualizações da tela
             atualizarIndicadores();
             mostrarAtendimentosAtivos();
             mostrarProximoAtendimento();
-        }, erro => console.error("Erro ao sincronizar Firestore no Dashboard:", erro));
+        }, erro => console.error("Erro crítico ao sincronizar Firestore no Dashboard:", erro));
 }
-
 /**
  * 🛠️ HELPER DE NORMALIZAÇÃO: Garante correspondência de datas independente do input (AAAA-MM-DD)
  */
